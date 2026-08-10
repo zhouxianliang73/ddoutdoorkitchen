@@ -1,0 +1,33 @@
+/**
+ * DD design · 交付/协作 UI 令牌
+ */
+:root {
+  --dd-doc-bg: #ececec;
+  --dd-doc-surface: #fff;
+  --dd-doc-surface-nested: #f7f7f7;
+  --dd-doc-surface-inset: #f3f3f3;
+  --dd-doc-text-black: #1a1a1a;
+  --dd-doc-text-strong: #333;
+  --dd-doc-text-default: #444;
+  --dd-doc-text-muted: #666;
+  --dd-doc-text-light: #999;
+  --dd-doc-text-faint: #bbb;
+  --dd-doc-border-subtle: #eee;
+  --dd-doc-border-default: #e0e0e0;
+  --dd-doc-action-bg: #333;
+  --dd-doc-action-hover: #1a1a1a;
+  --dd-doc-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --dd-doc-elevation-hover: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --dd-doc-shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  --dd-doc-font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --dd-doc-fs-xs: 11px;
+  --dd-doc-fs-sm: 12px;
+  --dd-doc-fs-base: 13px;
+  --dd-doc-fs-md: 14px;
+  --dd-doc-fs-lg: 16px;
+  --dd-doc-fs-xl: 20px;
+  --dd-doc-fw-bold: 600;
+  --dd-doc-fw-medium: 500;
+  --dd-doc-fw-normal: 400;
+  --dd-doc-radius: 6px;
+}

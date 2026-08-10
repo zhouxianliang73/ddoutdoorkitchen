@@ -1,0 +1,257 @@
+{
+  "version": 4,
+  "itemId": "item-wine-cabinet",
+  "matrixKey": "wine-cabinet-2800",
+  "compareClass": "2800×3000×600",
+  "lockToCompareClass": true,
+  "layout": "vendor-cards",
+  "layoutToggle": true,
+  "cardPrimaryKeys": [
+    "schemeType",
+    "coolingPolicy",
+    "priceBasis",
+    "material",
+    "bodyPrice",
+    "coolingPrice",
+    "totalPrice"
+  ],
+  "title": "定制酒柜 · 2800×3000×600 采购对比",
+  "subtitle": "业主锚点：常温+预留后期制冷 · 约180–200瓶 · 3000K · 四家报价 · 勿跨「常温预留/一体恒温」直接比总价",
+  "ownerReqSummary": "2800×3000×600 · 净深450 · 约180–200瓶 · 常温柜预留下上≥150mm风口后期加冷 · 3000K灯 · 四门钢化玻璃+阻尼铰链 · 木饰面外观+金属酒架",
+  "ownerReqByKey": {
+    "series": "定制酒柜（效果如图）",
+    "schemeType": "常温柜体，预留后期加冷（非出厂一体恒温）",
+    "priceBasis": "2800×3000×600 mm",
+    "coolingPolicy": "上下风口≥150mm，后期可加管道/分体机",
+    "material": "木饰面外观",
+    "rack": "金属酒架，可调节",
+    "glassDoor": "四扇钢化玻璃门 + 阻尼铰链",
+    "lighting": "3000K 暖白 LED",
+    "coreConfig": "约180–200瓶 · 可用净深450mm",
+    "extras": "先做柜、后加冷",
+    "bodyPrice": "—",
+    "coolingPrice": "本期不含制冷主机，仅预留",
+    "totalPrice": "—",
+    "taxNote": "—",
+    "payment": "—",
+    "leadTime": "—",
+    "warranty": "—"
+  },
+  "filterColumns": [
+    "supplier",
+    "series",
+    "schemeType",
+    "coolingPolicy",
+    "totalPrice"
+  ],
+  "columns": [
+    {
+      "key": "supplier",
+      "label": "供应商",
+      "sticky": true
+    },
+    {
+      "key": "series",
+      "label": "方案/型号"
+    },
+    {
+      "key": "schemeType",
+      "label": "方案类型"
+    },
+    {
+      "key": "priceBasis",
+      "label": "尺寸口径"
+    },
+    {
+      "key": "coolingPolicy",
+      "label": "制冷策略"
+    },
+    {
+      "key": "material",
+      "label": "柜体材质"
+    },
+    {
+      "key": "rack",
+      "label": "酒架"
+    },
+    {
+      "key": "glassDoor",
+      "label": "门体玻璃"
+    },
+    {
+      "key": "lighting",
+      "label": "灯光"
+    },
+    {
+      "key": "coreConfig",
+      "label": "核心配置"
+    },
+    {
+      "key": "extras",
+      "label": "备注/风险"
+    },
+    {
+      "key": "bodyPrice",
+      "label": "柜体造价",
+      "type": "price"
+    },
+    {
+      "key": "coolingPrice",
+      "label": "制冷设备",
+      "type": "price"
+    },
+    {
+      "key": "totalPrice",
+      "label": "合计(元)",
+      "emphasize": true,
+      "type": "price"
+    },
+    {
+      "key": "taxNote",
+      "label": "税/运装"
+    },
+    {
+      "key": "payment",
+      "label": "付款方式"
+    },
+    {
+      "key": "leadTime",
+      "label": "交货周期"
+    },
+    {
+      "key": "warranty",
+      "label": "质保"
+    }
+  ],
+  "mobileCompactColumns": [
+    "supplier",
+    "schemeType",
+    "coolingPolicy",
+    "totalPrice"
+  ],
+  "mobileAttrs": [
+    "series",
+    "priceBasis",
+    "coolingPolicy",
+    "material",
+    "rack",
+    "glassDoor",
+    "lighting",
+    "coreConfig",
+    "taxNote",
+    "payment",
+    "leadTime",
+    "warranty",
+    "extras"
+  ],
+  "rows": [
+    {
+      "id": "wc-maidi-ambient",
+      "partyId": "party-maidi",
+      "supplier": "广东迈帝逊堡",
+      "series": "常温柜 AW8-07-07",
+      "schemeType": "常温预留",
+      "priceBasis": "2800×3000×600",
+      "coolingPolicy": "常温；可按业主要求预留后期加冷",
+      "material": "304不锈钢 1.2mm",
+      "rack": "柜内架 304 不锈钢",
+      "glassDoor": "工艺写 5+19A+5 中空钢化",
+      "lighting": "3000K 横竖灯带",
+      "coreConfig": "激光开料+V槽 / 无指纹镀层 / 隐藏拉手 / 出口木箱×3",
+      "extras": "与业主「先柜后冷」方向匹配；铰链软关未写清",
+      "bodyPrice": 37800,
+      "coolingPrice": null,
+      "shadePrice": null,
+      "totalPrice": 39000,
+      "priceNote": "柜体37800 + 出口木箱1200；不含税票；运费甲方",
+      "taxNote": "不含税票；运甲方",
+      "payment": "定金50% + 出货50%",
+      "leadTime": "图纸+定金后35天出货",
+      "warranty": "未写",
+      "tag": "主谈·常温",
+      "motorLight": "3000K LED",
+      "fitOwner": "high"
+    },
+    {
+      "id": "wc-maifei-const",
+      "partyId": "party-maifei",
+      "supplier": "中山迈菲",
+      "series": "恒温柜 Mf20260807",
+      "schemeType": "恒温一体",
+      "priceBasis": "2800×3000×550（深比业主少50）",
+      "coolingPolicy": "恒温一体机组；全室10–22℃；非预留后装",
+      "material": "柜体内外不锈钢 + 50mm一体发泡保温",
+      "rack": "欧洲进口榉木层架 ¥14,300",
+      "glassDoor": "中空5+15A+5双层钢化；不锈钢门框；明装拉手；机械锁",
+      "lighting": "门框两侧LED 3000K",
+      "coreConfig": "柜体32500+层架14300+门6200+机组15000=68000；推广优惠46200",
+      "extras": "出口木架/运装/税不含；出口不在保修范围；最终以复尺为准",
+      "bodyPrice": 32500,
+      "coolingPrice": 15000,
+      "shadePrice": null,
+      "totalPrice": 46200,
+      "priceNote": "原价合计68000；推广优惠价46200",
+      "taxNote": "不含税/运/装/木架",
+      "payment": "定金50% + 出货前50%",
+      "leadTime": "定做约28天；代发港口/仓1–2天",
+      "warranty": "整机1年；压缩机3年换新（出口不含）",
+      "tag": "恒温·优惠",
+      "motorLight": "3000K LED",
+      "fitOwner": "medium"
+    },
+    {
+      "id": "wc-weinuo-integrated",
+      "partyId": "party-weinuo",
+      "supplier": "中山维诺",
+      "series": "整机（含设备）",
+      "schemeType": "整机一体",
+      "priceBasis": "尺寸未写（应对齐2800×3000×600）",
+      "coolingPolicy": "整机含制冷；明确不可后期加装",
+      "material": "不锈钢均为304",
+      "rack": "未拆分",
+      "glassDoor": "未写",
+      "lighting": "未写",
+      "coreConfig": "报价已含整机设备，拆箱插电可用",
+      "extras": "与业主「后期加冷」冲突；出口只寄配件；明细过粗待补",
+      "bodyPrice": null,
+      "coolingPrice": null,
+      "shadePrice": null,
+      "totalPrice": 71400,
+      "priceNote": "一口价；不含税不含运不含安装",
+      "taxNote": "不含税/运/安装",
+      "payment": "未写",
+      "leadTime": "未写",
+      "warranty": "国内保修3年",
+      "tag": "冲突",
+      "motorLight": "—",
+      "fitOwner": "low"
+    },
+    {
+      "id": "wc-xiangsheng-const",
+      "partyId": "party-xiangsheng",
+      "supplier": "深圳祥盛卢森堡",
+      "series": "恒温一体 XS2026-08-070008",
+      "schemeType": "恒温一体",
+      "priceBasis": "2800×3000×600",
+      "coolingPolicy": "出厂恒温（Embraco×2）；非预留后装",
+      "material": "304#1.2 不锈钢 + 内外发泡50mm",
+      "rack": "北美红橡木酒架 ¥26,437",
+      "glassDoor": "5+15A+5 中空热反白玻；柜门另计",
+      "lighting": "3000K LED 33m + 变压器×2",
+      "coreConfig": "压缩机17600 + 柜体54600 + 酒架26437 + 门14000 + 灯/锁等",
+      "extras": "页眉「不含税」与说明「含税」矛盾，需裁定；偏超配业主方案",
+      "bodyPrice": 54600,
+      "coolingPrice": 17600,
+      "shadePrice": null,
+      "totalPrice": 117117,
+      "priceNote": "设备17600+柜体及酒架等；合计117117",
+      "taxNote": "含税口径待核；不含安装运输搬运",
+      "payment": "预付50% + 出货前付清",
+      "leadTime": "图纸+定金后45工作日装完",
+      "warranty": "整体免费维护2年",
+      "tag": "超配",
+      "motorLight": "3000K LED",
+      "fitOwner": "medium"
+    }
+  ]
+}

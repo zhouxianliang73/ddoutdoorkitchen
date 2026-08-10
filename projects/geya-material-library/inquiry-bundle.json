@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "slug": "geya-material-library",
+  "name": "格雅衣柜 · 材料色卡库",
+  "client": "内部材料库",
+  "productName": "格雅衣柜色卡",
+  "channel": "custom",
+  "projectType": "格雅衣柜",
+  "status": "material-library",
+  "statusLabel": "材料库",
+  "updatedAt": "2026-07-10",
+  "sourceFile": "材料收集/",
+  "comm": {
+    "commImagesSummary": "格雅衣柜材料库共 303 张色卡（4 大类），浏览：material-view.html?slug=geya-material-library",
+    "commImages": [],
+    "commContentByDate": [
+      {
+        "date": "2026-07-10",
+        "items": [
+          {
+            "text": "【材料商】格雅衣柜 · 史海霞",
+            "status": "confirmed",
+            "role": "supplier"
+          },
+          {
+            "text": "2025【格雅花色无缝贴图】 42 款 · 格雅花色HL贴图 104 款 · 格雅系列贴图 68 款 · 格雅apress艾普雷特颜色 89 款",
+            "status": "confirmed",
+            "role": "team"
+          },
+          {
+            "text": "标准图：../材料收集/厨房标准.dwg",
+            "status": "confirmed",
+            "role": "team"
+          }
+        ]
+      }
+    ],
+    "schemeVersions": [
+      {
+        "version": "材料库 V1",
+        "date": "2026-07-10",
+        "summary": "全量色卡索引，项目讨论选门板/柜体色用",
+        "images": []
+      }
+    ]
+  },
+  "suppliers": [
+    {
+      "id": "geya",
+      "name": "格雅衣柜",
+      "contact": "史海霞",
+      "sheetName": "材料色卡",
+      "currency": "CNY",
+      "totalText": "色卡库",
+      "lines": [],
+      "note": "本条目为材料库，非报价比价；报价单后续按项目单独建 inquiry-bundle"
+    }
+  ],
+  "materialLibraryRef": "projects/geya-material-library/material-library.json",
+  "notion": {
+    "pageUrl": "https://app.notion.com/p/398ebe664ad08187aed8e14a5636c07a",
+    "projectRowUrl": "https://app.notion.com/p/398ebe664ad08179bda1cc89889fc8c8",
+    "workspace": "家具服务工作台",
+    "siteBase": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com",
+    "discussionUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/inquiry-view.html?slug=geya-material-library",
+    "materialUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/material-view.html?slug=geya-material-library",
+    "note": "dd-design.com 为域名停放页，未购买；正式访问用 Netlify"
+  },
+  "discussionUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/inquiry-view.html?slug=geya-material-library",
+  "materialUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/material-view.html?slug=geya-material-library"
+}

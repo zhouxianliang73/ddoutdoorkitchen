@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "slug": "geya-material-library",
+  "name": "格雅衣柜 · 材料色卡库",
+  "client": "内部材料库",
+  "projectType": "格雅衣柜",
+  "channel": "custom",
+  "quoteTemplate": "wardrobe",
+  "status": "材料库",
+  "suppliers": [
+    {
+      "id": "geya",
+      "name": "格雅衣柜",
+      "contact": "史海霞",
+      "quoteStatus": "色卡已归档"
+    }
+  ],
+  "materialLibrary": {
+    "index": "projects/geya-material-library/material-library.json",
+    "catalog": "catalog/materials/geya-swatches.json",
+    "viewer": "material-view.html?slug=geya-material-library",
+    "thumbs": "assets/materials/geya/thumbs/",
+    "sourceRoot": "../材料收集",
+    "swatchCount": 303,
+    "categories": 4
+  },
+  "updatedAt": "2026-07-10",
+  "notes": "原始色卡位于 材料收集/；重建：npm run build:geya-materials；环境变量 GEYA_SOURCE_ROOT",
+  "notion": {
+    "pageUrl": "https://app.notion.com/p/398ebe664ad08187aed8e14a5636c07a",
+    "projectRowUrl": "https://app.notion.com/p/398ebe664ad08179bda1cc89889fc8c8",
+    "workspace": "家具服务工作台",
+    "siteBase": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com",
+    "discussionUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/inquiry-view.html?slug=geya-material-library",
+    "materialUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/material-view.html?slug=geya-material-library",
+    "note": "dd-design.com 为域名停放页，未购买；正式访问用 Netlify"
+  },
+  "discussionUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/inquiry-view.html?slug=geya-material-library",
+  "materialUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/material-view.html?slug=geya-material-library",
+  "links": {
+    "discussion": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/inquiry-view.html?slug=geya-material-library",
+    "material": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/material-view.html?slug=geya-material-library",
+    "notionNotes": "slug: geya-material-library\n讨论: https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/inquiry-view.html?slug=geya-material-library\n色卡: https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/material-view.html?slug=geya-material-library\nNotion: https://app.notion.com/p/398ebe664ad08187aed8e14a5636c07a\n基址: https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com\n勿用 dd-design.com（停放页）"
+  }
+}

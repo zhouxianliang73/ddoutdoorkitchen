@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DD design · 合作伙伴申请</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="delivery-doc-tokens.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--dd-doc-font); background: var(--dd-doc-bg); color: var(--dd-doc-text-default); font-size: var(--dd-doc-fs-base); }
+        .wrap { max-width: 560px; margin: 0 auto; padding: 24px 16px 48px; }
+        h1 { font-size: var(--dd-doc-fs-xl); color: var(--dd-doc-text-strong); font-weight: var(--dd-doc-fw-bold); }
+        .sub { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin: 8px 0 20px; line-height: 1.5; }
+        .panel { background: var(--dd-doc-surface); border-radius: var(--dd-doc-radius); padding: 20px; box-shadow: var(--dd-doc-elevation-1); margin-bottom: 16px; }
+        label { display: block; font-size: var(--dd-doc-fs-sm); color: var(--dd-doc-text-muted); margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 8px 10px; margin-bottom: 12px; border: 1px solid var(--dd-doc-border-default); border-radius: var(--dd-doc-radius); font: inherit; }
+        .btn { padding: 10px 16px; border: none; border-radius: var(--dd-doc-radius); background: var(--dd-doc-action-bg); color: #fff; font: inherit; cursor: pointer; }
+        .err { color: #c0392b; font-size: var(--dd-doc-fs-sm); margin-top: 8px; }
+        .ok { color: #27ae60; font-size: var(--dd-doc-fs-sm); margin-top: 8px; line-height: 1.5; }
+        .nav { margin-bottom: 16px; }
+        .nav a { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin-right: 14px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <nav class="nav">
+            <a href="shop.html">选品中心</a>
+            <a href="partner.html">合作伙伴登录</a>
+        </nav>
+        <h1>合作伙伴申请</h1>
+        <p class="sub">经销商 / 材料商统一入口。审批通过后使用邮箱登录 partner 工作台，配置外发选品链接。客户链接默认不显示价格，可当面开启面价。</p>
+
+        <div id="formPanel" class="panel">
+            <label>公司 / 品牌名</label>
+            <input id="companyName" placeholder="例：格雅衣柜 / XX 户外经销" />
+            <label>联系人</label>
+            <input id="contactName" placeholder="姓名" />
+            <label>邮箱（审批通过后用于登录）</label>
+            <input id="email" type="email" autocomplete="email" placeholder="you@company.com" />
+            <label>身份类型</label>
+            <select id="partnerType">
+                <option value="dealer">经销商</option>
+                <option value="material">材料商</option>
+            </select>
+            <label>默认业务线 channel</label>
+            <select id="defaultChannel">
+                <option value="custom">定制</option>
+                <option value="outdoor-living">户外阳台</option>
+                <option value="outdoor-kitchen">户外厨房</option>
+                <option value="french-ru">法式 · 俄罗斯</option>
+                <option value="event-ru">活动家具 · 俄罗斯</option>
+            </select>
+            <label>补充说明</label>
+            <textarea id="note" rows="3" placeholder="主营品类、是否需要上传材料等"></textarea>
+            <button class="btn" id="submitBtn" type="button">提交申请</button>
+            <p id="formErr" class="err hidden"></p>
+        </div>
+        <div id="donePanel" class="panel hidden">
+            <p class="ok">已提交。DD 团队将在 admin 审批；通过后请用本邮箱在 <a href="partner.html">partner.html</a> 登录。</p>
+        </div>
+    </div>
+    <script src="js/dd-config.js"></script>
+    <script src="js/dd-api-contract.js"></script>
+    <script src="js/providers/api-supabase.js"></script>
+    <script src="js/providers/api-tencent.js"></script>
+    <script src="js/dd-api.js"></script>
+    <script>
+        (async function () {
+            const config = await DDConfig.loadConfig();
+            const errEl = document.getElementById('formErr');
+            document.getElementById('submitBtn').addEventListener('click', async () => {
+                errEl.classList.add('hidden');
+                try {
+                    await DDApi.partner.submitApplication(config, {
+                        companyName: document.getElementById('companyName').value.trim(),
+                        contactName: document.getElementById('contactName').value.trim(),
+                        email: document.getElementById('email').value.trim(),
+                        partnerType: document.getElementById('partnerType').value,
+                        defaultChannel: document.getElementById('defaultChannel').value,
+                        note: document.getElementById('note').value.trim(),
+                    });
+                    document.getElementById('formPanel').classList.add('hidden');
+                    document.getElementById('donePanel').classList.remove('hidden');
+                } catch (e) {
+                    errEl.textContent = (e.message === 'supabase_not_configured')
+                        ? '平台尚未配置 Supabase，请联系 DD 团队。'
+                        : (e.message || '提交失败');
+                    errEl.classList.remove('hidden');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

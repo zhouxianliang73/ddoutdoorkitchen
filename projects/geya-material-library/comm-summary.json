@@ -1,0 +1,34 @@
+{
+  "commImagesSummary": "格雅衣柜材料库共 303 张色卡（4 大类），浏览：material-view.html?slug=geya-material-library",
+  "commImages": [],
+  "commContentByDate": [
+    {
+      "date": "2026-07-10",
+      "items": [
+        {
+          "text": "【材料商】格雅衣柜 · 史海霞",
+          "status": "confirmed",
+          "role": "supplier"
+        },
+        {
+          "text": "2025【格雅花色无缝贴图】 42 款 · 格雅花色HL贴图 104 款 · 格雅系列贴图 68 款 · 格雅apress艾普雷特颜色 89 款",
+          "status": "confirmed",
+          "role": "team"
+        },
+        {
+          "text": "标准图：../材料收集/厨房标准.dwg",
+          "status": "confirmed",
+          "role": "team"
+        }
+      ]
+    }
+  ],
+  "schemeVersions": [
+    {
+      "version": "材料库 V1",
+      "date": "2026-07-10",
+      "summary": "全量色卡索引，项目讨论选门板/柜体色用",
+      "images": []
+    }
+  ]
+}

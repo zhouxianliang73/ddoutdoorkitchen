@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-06",
+  "siteBase": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com",
+  "partners": [
+    {
+      "id": "geya",
+      "type": "material",
+      "name": "格雅衣柜",
+      "companyName": "格雅衣柜",
+      "defaultChannel": "custom",
+      "exportSupplierId": "geya",
+      "exportSpaces": [
+        "格雅衣柜"
+      ],
+      "exportCatalogIds": []
+    }
+  ]
+}

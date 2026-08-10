@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "schema": "geya-wardrobe",
+  "description": "格雅衣柜项目讨论：柜体/门板/背板字段标签",
+  "cardLabels": {
+    "spec": "规格",
+    "bodyMaterial": "柜体板材",
+    "doorMaterial": "门板花色",
+    "unitDefault": "mm"
+  },
+  "lineFields": {
+    "materialBody": "柜体（多层板/欧松板/PET）",
+    "materialDoor": "门板花色（QZH/HL/可丽耐）",
+    "sourceRef": "色卡编号",
+    "color": "花色名称"
+  },
+  "materialCategories": [
+    { "id": "qzh", "label": "千千花色无缝贴图", "match": "格雅花色无缝" },
+    { "id": "hl", "label": "HL 华立贴图", "match": "HL" },
+    { "id": "apress", "label": "Apress 可丽耐", "match": "apress" },
+    { "id": "pet", "label": "格雅 PET 系列", "match": "格雅系列" }
+  ]
+}

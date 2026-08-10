@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-06",
+  "projects": [
+    {
+      "slug": "geya-material-library",
+      "name": "格雅衣柜 · 材料色卡库",
+      "type": "material-library",
+      "statusLabel": "材料库",
+      "discussionUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/inquiry-view.html?slug=geya-material-library",
+      "materialUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/material-view.html?slug=geya-material-library",
+      "notionPageUrl": "https://app.notion.com/p/398ebe664ad08187aed8e14a5636c07a",
+      "notionProjectRowUrl": "https://app.notion.com/p/398ebe664ad08179bda1cc89889fc8c8"
+    }
+  ]
+}

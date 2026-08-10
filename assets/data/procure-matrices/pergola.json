@@ -1,0 +1,259 @@
+{
+  "version": 3,
+  "itemId": "item-pergola",
+  "matrixKey": "pergola-6x4",
+  "compareClass": "6×4×2.5",
+  "lockToCompareClass": true,
+  "title": "电动翻转百叶凉亭 · 6×4 采购对比",
+  "subtitle": "统一口径：6×4×2.5 · 主体(含百叶) / 遮阳分列 · 柱子数量单独对比 · 无6×4用6×3并标注",
+  "filterColumns": [
+    "supplier",
+    "series",
+    "priceBasis",
+    "columnCount",
+    "columnSpec",
+    "louverSpec",
+    "beamSpec",
+    "motor",
+    "bodyPrice",
+    "shadePrice"
+  ],
+  "columns": [
+    {
+      "key": "supplier",
+      "label": "供应商",
+      "sticky": true
+    },
+    {
+      "key": "series",
+      "label": "型号"
+    },
+    {
+      "key": "priceBasis",
+      "label": "尺寸口径"
+    },
+    {
+      "key": "columnCount",
+      "label": "柱子数量"
+    },
+    {
+      "key": "columnSpec",
+      "label": "立柱截面"
+    },
+    {
+      "key": "louverSpec",
+      "label": "百叶规格"
+    },
+    {
+      "key": "beamSpec",
+      "label": "横梁/边梁"
+    },
+    {
+      "key": "material",
+      "label": "材质"
+    },
+    {
+      "key": "motor",
+      "label": "电机"
+    },
+    {
+      "key": "lighting",
+      "label": "灯光"
+    },
+    {
+      "key": "control",
+      "label": "控制"
+    },
+    {
+      "key": "drainage",
+      "label": "排水"
+    },
+    {
+      "key": "extras",
+      "label": "选项/备注"
+    },
+    {
+      "key": "bodyPrice",
+      "label": "主体造价(含百叶)",
+      "emphasize": true,
+      "type": "price"
+    },
+    {
+      "key": "shadePrice",
+      "label": "遮阳造价",
+      "type": "price"
+    },
+    {
+      "key": "totalPrice",
+      "label": "主体+遮阳",
+      "emphasize": true,
+      "type": "price"
+    },
+    {
+      "key": "payment",
+      "label": "付款方式"
+    },
+    {
+      "key": "leadTime",
+      "label": "交货周期"
+    }
+  ],
+  "mobileCompactColumns": [
+    "series",
+    "priceBasis",
+    "columnCount",
+    "bodyPrice",
+    "shadePrice"
+  ],
+  "mobileAttrs": [
+    "series",
+    "priceBasis",
+    "columnCount",
+    "columnSpec",
+    "louverSpec",
+    "beamSpec",
+    "material",
+    "motor",
+    "lighting",
+    "control",
+    "drainage",
+    "extras",
+    "bodyPrice",
+    "shadePrice",
+    "totalPrice",
+    "payment",
+    "leadTime"
+  ],
+  "rows": [
+    {
+      "id": "mx-yougelang-c7",
+      "partyId": "party-yougelang",
+      "supplier": "优格朗",
+      "series": "C7",
+      "priceBasis": "6×3（无6×4）",
+      "columnCount": "4",
+      "columnSpec": "未披露",
+      "louverSpec": "未披露",
+      "beamSpec": "未披露",
+      "material": "6063-T6",
+      "motor": "含（型号未写，质保4年）",
+      "lighting": "双色LED",
+      "control": "遥控（质保1年）",
+      "drainage": "未披露",
+      "extras": "木箱；喷涂质保7年；含税另报27478",
+      "bodyPrice": 25209,
+      "shadePrice": null,
+      "totalPrice": 25209,
+      "priceNote": "6×3参考价，红字口径",
+      "payment": "—",
+      "leadTime": "30天",
+      "tag": "6×3参考",
+      "motorLight": "双色LED",
+      "coreConfig": "6063-T6 / 四柱 / 木箱"
+    },
+    {
+      "id": "mx-zhide-175-6x4",
+      "partyId": "party-zhide",
+      "supplier": "致德户外",
+      "series": "型号-175",
+      "priceBasis": "6×4×2.5",
+      "columnCount": "4",
+      "columnSpec": "标配135×135×2.0；可升150×150×3.0",
+      "louverSpec": "175×40×1.5",
+      "beamSpec": "180×150×1.7（内置水槽）",
+      "material": "6063-T5",
+      "motor": "奥科防水电机+信号器",
+      "lighting": "顶部百叶灯带",
+      "control": "遥控+壁控；涂鸦+400",
+      "drainage": "主梁内置水槽，立柱内排水；隐藏螺丝；水电分流",
+      "extras": "选项：穿钢1920 / 立柱升级900 / 涂鸦400 / 木箱1200；本单合计24820/优惠22900",
+      "bodyPrice": 20400,
+      "shadePrice": null,
+      "totalPrice": 20400,
+      "priceNote": "主体含电机灯带；选项另计",
+      "payment": "50%定金 + 50%尾款",
+      "leadTime": "常规色约25个工作日",
+      "tag": "6×4正式",
+      "motorLight": "奥科防水电机+LED灯带",
+      "coreConfig": "175叶片 / 180边梁 / 4柱 / 立柱内排水"
+    },
+    {
+      "id": "mx-duocai-f008",
+      "partyId": "party-duocai",
+      "supplier": "多彩",
+      "series": "F008超重型",
+      "priceBasis": "6×4×2.4",
+      "columnCount": "4",
+      "columnSpec": "160×160×3.1",
+      "louverSpec": "221×45×2.0",
+      "beamSpec": "190×144×2.2",
+      "material": "铝合金（牌号未写）",
+      "motor": "AOK ×2",
+      "lighting": "含灯",
+      "control": "未写App",
+      "drainage": "未披露",
+      "extras": "约607kg / 3.5方；顶白边白柱灰",
+      "bodyPrice": 27800,
+      "shadePrice": 9100,
+      "totalPrice": 36900,
+      "priceNote": "遮阳=三面卷帘9100",
+      "payment": "—",
+      "leadTime": "—",
+      "tag": "6×4正式",
+      "motorLight": "AOK双电机+含灯",
+      "coreConfig": "重型叶片221 / 双电机 / 4柱160方"
+    },
+    {
+      "id": "mx-airuiyi-ws",
+      "partyId": "party-airuiyi",
+      "supplier": "艾瑞利",
+      "series": "WS重型翻转百叶",
+      "priceBasis": "6×4×2.5",
+      "columnCount": "未披露",
+      "columnSpec": "未披露",
+      "louverSpec": "重型（截面未写）",
+      "beamSpec": "未披露",
+      "material": "6063-T5",
+      "motor": "含电机/控制器/接收器",
+      "lighting": "叶片灯带",
+      "control": "遥控；Tuya可选+350",
+      "drainage": "未披露",
+      "extras": "另有带外飘案6.6×4.6；阳光房另案不计入主体",
+      "bodyPrice": 26664,
+      "shadePrice": 9215,
+      "totalPrice": 35879,
+      "priceNote": "遮阳=三面卷帘9215",
+      "payment": "非标定金50%",
+      "leadTime": "—",
+      "tag": "6×4正式",
+      "motorLight": "电机灯控含在主体",
+      "coreConfig": "按㎡1111计价 / 砂灰"
+    },
+    {
+      "id": "mx-ankesen-6x4",
+      "partyId": "party-ankesen",
+      "supplier": "安科森",
+      "series": "翻板顶棚",
+      "priceBasis": "6×4（高未写）",
+      "columnCount": "4",
+      "columnSpec": "160×160×3.0",
+      "louverSpec": "160×30×1.4",
+      "beamSpec": "175×50×2.0",
+      "material": "6063-T5",
+      "motor": "AM36-D1500N-XP",
+      "lighting": "叶片+雨槽LED",
+      "control": "涂鸦App",
+      "drainage": "水槽63×45×1.4",
+      "extras": "四周外飘30cm；2cm隔热+铝扣板吊顶；边框穿工字钢；卷帘有规格无价",
+      "bodyPrice": null,
+      "shadePrice": null,
+      "totalPrice": null,
+      "priceNote": "仅规格，总价待补",
+      "payment": "—",
+      "leadTime": "—",
+      "tag": "待补价",
+      "motorLight": "AM36+双位LED",
+      "coreConfig": "外飘+隔热吊顶+穿钢 / 涂鸦"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "templates": {
+    "default": {
+      "label": "全案清单",
+      "matchProjectTypes": ["全案设计", "卧室改造", "书房定制", "全屋全案", "合并方案"],
+      "sections": [
+        { "id": "products", "name": "产品清单", "icon": "🛒" }
+      ]
+    },
+    "outdoor-shade-compare": {
+      "label": "户外遮阳伞比价",
+      "matchProjectTypes": ["户外遮阳寻源", "遮阳伞寻源", "户外遮阳"],
+      "sections": [
+        { "id": "shade", "name": "遮阳伞报价对比", "icon": "☀️" },
+        { "id": "logistics", "name": "运费/安装", "icon": "🚚" }
+      ]
+    },
+    "outdoor-scene": {
+      "label": "户外阳台整体",
+      "matchProjectTypes": ["户外全案", "户外阳台", "别墅户外"],
+      "sections": [
+        { "id": "design", "name": "设计服务", "icon": "✏️" },
+        { "id": "kitchen", "name": "户外厨房/烧烤", "icon": "🔥" },
+        { "id": "structure", "name": "凉亭/结构", "icon": "🏛️" },
+        { "id": "shade", "name": "遮阳配套", "icon": "☀️" },
+        { "id": "furniture", "name": "户外家具", "icon": "🛋️" },
+        { "id": "logistics", "name": "物流安装", "icon": "🚚" }
+      ]
+    },
+    "outdoor-kitchen": {
+      "label": "户外厨房",
+      "matchProjectTypes": ["户外厨房", "岛台", "户外烧烤"],
+      "sections": [
+        { "id": "cabinet", "name": "柜体", "icon": "🗄️" },
+        { "id": "countertop", "name": "台面/岛台", "icon": "▬" },
+        { "id": "grill", "name": "烧烤设备", "icon": "🔥" },
+        { "id": "hardware", "name": "功能配件", "icon": "⚙️" },
+        { "id": "electric", "name": "电器", "icon": "🔌" },
+        { "id": "logistics", "name": "物流安装", "icon": "🚚" }
+      ]
+    },
+    "event": {
+      "label": "活动家具快单",
+      "matchProjectTypes": ["活动家具", "活动批量"],
+      "sections": [
+        { "id": "products", "name": "活动 SKU", "icon": "🎪" },
+        { "id": "logistics", "name": "物流批次", "icon": "🚚" }
+      ]
+    },
+    "kitchen": {
+      "label": "不锈钢橱柜",
+      "matchProjectTypes": ["不锈钢橱柜", "不锈钢厨柜"],
+      "sections": [
+        { "id": "cabinet", "name": "柜体", "icon": "🗄️" },
+        { "id": "countertop", "name": "台面", "icon": "▬" },
+        { "id": "panel", "name": "见光板", "icon": "📐" },
+        { "id": "trim", "name": "地脚线/顶封板", "icon": "📏" },
+        { "id": "hardware", "name": "功能配件", "icon": "⚙️" },
+        { "id": "sink", "name": "水槽/龙头", "icon": "🚰" },
+        { "id": "electric", "name": "电器", "icon": "🔌" },
+        { "id": "extra", "name": "增加项目", "icon": "➕" }
+      ]
+    },
+    "wardrobe": {
+      "label": "格雅衣柜",
+      "matchProjectTypes": ["格雅衣柜", "全屋定制", "衣柜定制"],
+      "sections": [
+        { "id": "cabinet", "name": "柜体", "icon": "🗄️" },
+        { "id": "door", "name": "门板花色", "icon": "🚪" },
+        { "id": "panel", "name": "见光板/封板", "icon": "📐" },
+        { "id": "hardware", "name": "五金", "icon": "⚙️" },
+        { "id": "mirror", "name": "镜子/配件", "icon": "🪞" },
+        { "id": "extra", "name": "增加项目", "icon": "➕" },
+        { "id": "logistics", "name": "物流安装", "icon": "🚚" }
+      ]
+    }
+  }
+}

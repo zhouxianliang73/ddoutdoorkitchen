@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>DD design · 团队</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="delivery-doc-tokens.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--dd-doc-font);
+            background: var(--dd-doc-bg);
+            color: var(--dd-doc-text-default);
+            font-size: var(--dd-doc-fs-base);
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .wrap {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 16px 16px calc(88px + env(safe-area-inset-bottom, 0px));
+        }
+        body.is-login .wrap { padding-bottom: 48px; }
+        h1 {
+            font-size: var(--dd-doc-fs-xl);
+            color: var(--dd-doc-text-strong);
+            font-weight: var(--dd-doc-fw-bold);
+        }
+        .sub { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin: 6px 0 16px; }
+        .panel {
+            background: var(--dd-doc-surface);
+            border-radius: var(--dd-doc-radius);
+            padding: 16px;
+            box-shadow: var(--dd-doc-elevation-1);
+            margin-bottom: 12px;
+        }
+        .panel h2 { font-size: var(--dd-doc-fs-lg); margin-bottom: 12px; color: var(--dd-doc-text-strong); }
+        label { display: block; font-size: var(--dd-doc-fs-sm); color: var(--dd-doc-text-muted); margin-bottom: 4px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            border: 1px solid var(--dd-doc-border-default);
+            border-radius: var(--dd-doc-radius);
+            font: inherit;
+            font-size: 16px; /* 避免 iOS 聚焦放大 */
+            background: #fff;
+        }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--dd-doc-radius);
+            background: var(--dd-doc-action-bg);
+            color: #fff;
+            font: inherit;
+            cursor: pointer;
+            min-height: 40px;
+        }
+        .btn:hover { background: var(--dd-doc-action-hover); }
+        .btn:disabled { opacity: 0.55; cursor: wait; }
+        .btn-sm { padding: 8px 12px; font-size: var(--dd-doc-fs-sm); min-height: 36px; }
+        .btn-ghost {
+            background: transparent;
+            color: var(--dd-doc-text-muted);
+            border: 1px solid var(--dd-doc-border-default);
+        }
+        .btn-block { width: 100%; }
+        .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+        .err { color: #c0392b; font-size: var(--dd-doc-fs-sm); margin-top: 8px; }
+        .ok { color: #27ae60; font-size: var(--dd-doc-fs-sm); margin-top: 8px; word-break: break-all; }
+        .nav { margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 12px; }
+        .nav a { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); text-decoration: none; }
+        .hidden { display: none !important; }
+        code {
+            font-size: var(--dd-doc-fs-xs);
+            background: var(--dd-doc-surface-nested);
+            padding: 2px 6px;
+            border-radius: 3px;
+            word-break: break-all;
+        }
+        .check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .check-row input { width: auto; margin: 0; font-size: inherit; }
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 0;
+        }
+        .user-bar #userLabel {
+            font-size: var(--dd-doc-fs-sm);
+            color: var(--dd-doc-text-muted);
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 项目内子 Tab */
+        .subtabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            margin-bottom: 12px;
+            background: var(--dd-doc-surface);
+            border-radius: var(--dd-doc-radius);
+            box-shadow: var(--dd-doc-elevation-1);
+            overflow: hidden;
+            border: 1px solid var(--dd-doc-border-subtle);
+        }
+        .subtab-btn {
+            padding: 12px 10px;
+            border: none;
+            background: transparent;
+            font: inherit;
+            font-size: var(--dd-doc-fs-sm);
+            color: var(--dd-doc-text-muted);
+            cursor: pointer;
+            min-height: 44px;
+        }
+        .subtab-btn + .subtab-btn { border-left: 1px solid var(--dd-doc-border-subtle); }
+        .subtab-btn.active {
+            background: var(--dd-doc-action-bg);
+            color: #fff;
+            font-weight: var(--dd-doc-fw-medium);
+        }
+
+        /* 底部主导航 Tab */
+        .tabbar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 40;
+            display: none;
+            background: var(--dd-doc-surface);
+            border-top: 1px solid var(--dd-doc-border-default);
+            padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+        }
+        body.is-dash .tabbar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .tab-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 8px 4px;
+            border: none;
+            border-radius: var(--dd-doc-radius);
+            background: transparent;
+            color: var(--dd-doc-text-muted);
+            font: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            min-height: 52px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-btn .tab-ico {
+            width: 22px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.75;
+        }
+        .tab-btn.active {
+            color: var(--dd-doc-text-strong);
+            background: var(--dd-doc-surface-nested);
+            font-weight: var(--dd-doc-fw-medium);
+        }
+        .tab-btn.active .tab-ico { opacity: 1; }
+
+        /* 项目卡片列表 */
+        .card-list { display: flex; flex-direction: column; gap: 10px; }
+        .proj-card {
+            border: 1px solid var(--dd-doc-border-subtle);
+            border-radius: var(--dd-doc-radius);
+            padding: 12px;
+            background: var(--dd-doc-surface);
+        }
+        .proj-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .proj-card-name {
+            font-size: var(--dd-doc-fs-md);
+            font-weight: var(--dd-doc-fw-medium);
+            color: var(--dd-doc-text-strong);
+            min-width: 0;
+            word-break: break-word;
+        }
+        .proj-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+            font-size: var(--dd-doc-fs-sm);
+            color: var(--dd-doc-text-muted);
+            margin-bottom: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--dd-doc-surface-nested);
+            color: var(--dd-doc-text-muted);
+            font-size: var(--dd-doc-fs-xs);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .app-card {
+            border: 1px solid var(--dd-doc-border-subtle);
+            border-radius: var(--dd-doc-radius);
+            padding: 12px;
+            margin-bottom: 10px;
+            background: var(--dd-doc-surface);
+        }
+
+        @media (min-width: 768px) {
+            .wrap { padding: 24px 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
+            body.is-login .wrap { padding-bottom: 48px; }
+            .panel { padding: 20px; margin-bottom: 16px; }
+            input, select, textarea { font-size: inherit; padding: 8px 10px; }
+            .tabbar {
+                left: 50%;
+                right: auto;
+                bottom: 16px;
+                width: min(420px, calc(100% - 32px));
+                transform: translateX(-50%);
+                border: 1px solid var(--dd-doc-border-default);
+                border-radius: 14px;
+                padding: 8px;
+                box-shadow: var(--dd-doc-elevation-hover);
+            }
+            body.is-dash .wrap { padding-bottom: 108px; }
+        }
+    </style>
+</head>
+<body class="is-login">
+    <div class="wrap">
+        <nav class="nav">
+            <a href="shop.html">选品中心</a>
+            <a href="procure.html">采购工具</a>
+            <a href="partner.html">合作伙伴</a>
+            <a href="showcase.html">精选案例</a>
+        </nav>
+        <h1>DD design · 团队</h1>
+        <p class="sub">内部 ERP · 底部 Tab 切换 · 手机可直接操作</p>
+
+        <div id="loginPanel" class="panel">
+            <h2>登录</h2>
+            <form id="loginForm" autocomplete="on">
+                <label for="email">邮箱</label>
+                <!-- text + inputmode：避免微信/iOS 上 type=email 键盘与自动填充卡死 -->
+                <input
+                    id="email"
+                    name="email"
+                    type="text"
+                    inputmode="email"
+                    autocomplete="email"
+                    autocapitalize="off"
+                    autocorrect="off"
+                    spellcheck="false"
+                    enterkeyhint="next"
+                    placeholder="317012543@qq.com"
+                    value="317012543@qq.com"
+                />
+                <label for="password">密码</label>
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    enterkeyhint="done"
+                />
+                <button class="btn btn-block" id="loginBtn" type="submit">登录</button>
+            </form>
+            <p id="loginErr" class="err hidden"></p>
+        </div>
+
+        <div id="dashPanel" class="hidden">
+            <div class="panel">
+                <div class="row user-bar">
+                    <span id="userLabel"></span>
+                    <button class="btn btn-ghost btn-sm" id="logoutBtn" type="button">退出</button>
+                </div>
+            </div>
+
+            <div id="tab-projects">
+                <div class="subtabs" role="tablist" aria-label="项目">
+                    <button type="button" class="subtab-btn active" data-subtab="list">项目列表</button>
+                    <button type="button" class="subtab-btn" data-subtab="create">新建项目</button>
+                </div>
+
+                <div id="subtab-list">
+                    <div class="panel">
+                        <h2>项目列表</h2>
+                        <div id="tableWrap" class="sub">加载中…</div>
+                    </div>
+                </div>
+
+                <div id="subtab-create" class="hidden">
+                    <div class="panel">
+                        <h2>新建项目</h2>
+                        <label>客户名称</label>
+                        <input id="clientName" placeholder="张先生 / AliReza" />
+                        <label>渠道</label>
+                        <select id="channel">
+                            <option value="custom">定制</option>
+                            <option value="outdoor-living">户外阳台</option>
+                            <option value="outdoor-kitchen">户外厨房</option>
+                            <option value="french-ru">法式 · 俄罗斯</option>
+                            <option value="event-ru">活动家具 · 俄罗斯</option>
+                        </select>
+                        <label>销售备注 (invite)</label>
+                        <input id="inviteLabel" placeholder="客户简称" />
+                        <button class="btn btn-block" id="createBtn" type="button">创建并生成链接</button>
+                        <p id="createMsg" class="ok hidden"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-partnerLinks" class="hidden">
+                <div class="panel">
+                    <h2>生成 Partner 外发链接</h2>
+                    <p class="sub" style="margin-bottom:12px">配置来自 partners.json（离线）或 Supabase partners 表。C 端默认无面价。</p>
+                    <label>Partner</label>
+                    <select id="partnerSelect"></select>
+                    <label>客户简称 invite</label>
+                    <input id="partnerInvite" placeholder="张先生" />
+                    <div class="check-row">
+                        <input type="checkbox" id="partnerShowPrice" />
+                        <label for="partnerShowPrice" style="margin:0">显示面价 showPrice=1</label>
+                    </div>
+                    <button class="btn btn-block" id="copyPartnerLinkBtn" type="button">复制链接</button>
+                    <p id="partnerLinkOut" class="ok hidden"></p>
+                </div>
+            </div>
+
+            <div id="tab-approvals" class="hidden">
+                <div class="panel">
+                    <h2>待审批申请</h2>
+                    <p class="sub" style="margin-bottom:12px">先在 Supabase Auth 创建用户（同申请邮箱），复制 User UUID 后批准。</p>
+                    <div id="appsWrap" class="sub">加载中…</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="tabbar" id="tabbar" aria-label="主导航">
+        <button type="button" class="tab-btn active" data-tab="projects" aria-current="page">
+            <span class="tab-ico" aria-hidden="true">▣</span>
+            <span>项目</span>
+        </button>
+        <button type="button" class="tab-btn" data-tab="partnerLinks">
+            <span class="tab-ico" aria-hidden="true">↗</span>
+            <span>链接</span>
+        </button>
+        <button type="button" class="tab-btn" data-tab="approvals">
+            <span class="tab-ico" aria-hidden="true">✓</span>
+            <span>审批</span>
+        </button>
+    </nav>
+
+    <script src="js/dd-config.js"></script>
+    <script src="js/dd-api-contract.js"></script>
+    <script src="js/providers/api-supabase.js"></script>
+    <script src="js/providers/api-tencent.js"></script>
+    <script src="js/dd-api.js"></script>
+    <script>
+        (async function () {
+            const config = await DDConfig.loadConfig();
+            const SESSION_KEY = 'dd_design_session';
+            let session = loadSession();
+            let partnersLocal = [];
+
+            const loginPanel = document.getElementById('loginPanel');
+            const dashPanel = document.getElementById('dashPanel');
+            const loginErr = document.getElementById('loginErr');
+            const createMsg = document.getElementById('createMsg');
+
+            function safeNextUrl() {
+                try {
+                    const next = new URLSearchParams(location.search).get('next');
+                    if (!next) return '';
+                    // 仅允许站内相对路径，防止开放重定向
+                    if (/^https?:|\/\//i.test(next) || next.includes('..')) return '';
+                    if (!/^[a-zA-Z0-9_\-./]+\.html(\?[#&=%a-zA-Z0-9_\-./]*)?(#[\w\-.]*)?$/.test(next)) return '';
+                    return next;
+                } catch (_) {
+                    return '';
+                }
+            }
+            function goNextOrDash() {
+                const next = safeNextUrl();
+                if (next) {
+                    location.replace(next);
+                    return true;
+                }
+                return false;
+            }
+
+            if (tokenOf(session)) {
+                if (!goNextOrDash()) showDash();
+            } else showLogin();
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+
+            document.querySelectorAll('.subtab-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchSubtab(btn.dataset.subtab));
+            });
+
+            const loginBtn = document.getElementById('loginBtn');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const LAST_EMAIL_KEY = 'dd_design_last_email';
+            try {
+                const lastEmail = localStorage.getItem(LAST_EMAIL_KEY);
+                if (lastEmail) emailInput.value = lastEmail;
+                else if (!emailInput.value) emailInput.value = '317012543@qq.com';
+            } catch (_) { /* ignore */ }
+
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                loginErr.classList.add('hidden');
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                if (!email || !password) {
+                    loginErr.textContent = '请填写邮箱和密码';
+                    loginErr.classList.remove('hidden');
+                    return;
+                }
+                loginBtn.disabled = true;
+                loginBtn.textContent = '登录中…';
+                emailInput.blur();
+                passwordInput.blur();
+                try {
+                    session = await withTimeout(
+                        DDApi.auth.loginWithPassword(config, email, password),
+                        15000,
+                        '登录超时，请检查网络后重试'
+                    );
+                    await withTimeout(
+                        DDApi.team.fetchCurrentMember(config, session),
+                        15000,
+                        '校验团队身份超时，请重试'
+                    );
+                    try { localStorage.setItem(LAST_EMAIL_KEY, email); } catch (_) { /* ignore */ }
+                    saveSession(session);
+                    if (goNextOrDash()) return;
+                    await showDash();
+                } catch (err) {
+                    loginErr.textContent = friendlyLoginError(err);
+                    loginErr.classList.remove('hidden');
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                }
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                session = null;
+                localStorage.removeItem(SESSION_KEY);
+                showLogin();
+            });
+
+            document.getElementById('createBtn').addEventListener('click', async () => {
+                createMsg.classList.add('hidden');
+                createMsg.className = 'ok hidden';
+                try {
+                    const created = await DDApi.team.createProject(config, session, {
+                        clientName: document.getElementById('clientName').value.trim(),
+                        channel: document.getElementById('channel').value,
+                        inviteLabel: document.getElementById('inviteLabel').value.trim(),
+                    });
+                    const link = DDApi.buildMagicLink(config, created.accessToken);
+                    createMsg.innerHTML = `已创建 <strong>${esc(created.projectNo)}</strong><br>Magic link：<code>${esc(link)}</code>`;
+                    createMsg.className = 'ok';
+                    createMsg.classList.remove('hidden');
+                    await refreshProjects();
+                    switchSubtab('list');
+                } catch (err) {
+                    createMsg.textContent = err.message || '创建失败';
+                    createMsg.className = 'err';
+                    createMsg.classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('copyPartnerLinkBtn').addEventListener('click', () => {
+                const sel = document.getElementById('partnerSelect');
+                const opt = sel.options[sel.selectedIndex];
+                if (!opt || !opt.value) return;
+                const link = DDApi.buildPartnerShopLink(config, {
+                    partnerId: opt.value,
+                    channel: opt.dataset.channel || 'custom',
+                    invite: document.getElementById('partnerInvite').value.trim(),
+                    showPrice: document.getElementById('partnerShowPrice').checked,
+                });
+                navigator.clipboard?.writeText(link);
+                const out = document.getElementById('partnerLinkOut');
+                out.innerHTML = '已复制：<code>' + esc(link) + '</code>';
+                out.classList.remove('hidden');
+            });
+
+            async function loadPartnersForSelect() {
+                const sel = document.getElementById('partnerSelect');
+                sel.innerHTML = '';
+                let list = [];
+                try {
+                    if (globalThis.DDApiSupabase?.isConfigured(config)) {
+                        list = await DDApi.partner.fetchPartnersList(config, session);
+                    }
+                } catch (e) { /* fallback json */ }
+                if (!list.length) {
+                    try {
+                        const res = await fetch('partners.json', { cache: 'no-store' });
+                        if (res.ok) {
+                            const data = await res.json();
+                            partnersLocal = data.partners || [];
+                            list = partnersLocal.map(p => ({
+                                id: p.id,
+                                name: p.name,
+                                defaultChannel: p.defaultChannel || 'custom',
+                            }));
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+                if (!list.length) {
+                    sel.innerHTML = '<option value="">（无 Partner，请维护 partners.json）</option>';
+                    return;
+                }
+                list.forEach(p => {
+                    const o = document.createElement('option');
+                    o.value = p.id;
+                    o.textContent = p.name + ' (' + p.id + ')';
+                    o.dataset.channel = p.defaultChannel || 'custom';
+                    sel.appendChild(o);
+                });
+            }
+
+            async function refreshApplications() {
+                const wrap = document.getElementById('appsWrap');
+                if (!globalThis.DDApiSupabase?.isConfigured(config)) {
+                    wrap.innerHTML = '<p class="err">Supabase 未配置，无法加载申请。</p>';
+                    return;
+                }
+                try {
+                    const rows = await DDApi.partner.fetchApplications(config, session, 'pending');
+                    if (!rows.length) {
+                        wrap.innerHTML = '<p class="sub">暂无待审批</p>';
+                        return;
+                    }
+                    wrap.innerHTML = rows.map(app => `
+                        <div class="app-card">
+                            <strong>${esc(app.companyName)}</strong> · ${esc(app.partnerType)}<br>
+                            <span class="sub">${esc(app.email)} · ${esc(app.contactName)}</span>
+                            <p class="sub">${esc(app.note || '')}</p>
+                            <label>partner id（slug）</label>
+                            <input class="ap-partner-id" data-app="${esc(app.id)}" placeholder="例：zhang-outdoor" />
+                            <label>Auth User UUID</label>
+                            <input class="ap-user-id" data-app="${esc(app.id)}" placeholder="Supabase Auth → Users" />
+                            <button type="button" class="btn btn-sm btn-block ap-approve" data-app="${esc(app.id)}">批准</button>
+                            <p class="ap-msg ok hidden" data-app="${esc(app.id)}"></p>
+                        </div>
+                    `).join('');
+                    wrap.querySelectorAll('.ap-approve').forEach(btn => {
+                        btn.addEventListener('click', () => approveApp(btn.dataset.app));
+                    });
+                } catch (e) {
+                    wrap.innerHTML = '<p class="err">' + esc(e.message) + '</p>';
+                }
+            }
+
+            async function approveApp(appId) {
+                const pid = document.querySelector('.ap-partner-id[data-app="' + appId + '"]')?.value.trim();
+                const uid = document.querySelector('.ap-user-id[data-app="' + appId + '"]')?.value.trim();
+                const msg = document.querySelector('.ap-msg[data-app="' + appId + '"]');
+                if (!pid || !uid) {
+                    msg.textContent = '请填写 partner id 与 Auth UUID';
+                    msg.className = 'err';
+                    msg.classList.remove('hidden');
+                    return;
+                }
+                try {
+                    await DDApi.partner.approveApplication(config, session, {
+                        applicationId: appId,
+                        partnerId: pid,
+                        authUserId: uid,
+                    });
+                    msg.textContent = '已批准，Partner 可用邮箱登录 partner.html';
+                    msg.className = 'ok';
+                    msg.classList.remove('hidden');
+                    await refreshApplications();
+                    await loadPartnersForSelect();
+                } catch (e) {
+                    msg.textContent = e.message || '批准失败';
+                    msg.className = 'err';
+                    msg.classList.remove('hidden');
+                }
+            }
+
+            async function refreshProjects() {
+                const wrap = document.getElementById('tableWrap');
+                try {
+                    const rows = await DDApi.team.fetchProjects(config, session);
+                    if (!rows.length) {
+                        wrap.innerHTML = '<p class="sub">暂无项目</p>';
+                        return;
+                    }
+                    wrap.innerHTML = `<div class="card-list">${rows.map(r => `
+                        <article class="proj-card">
+                            <div class="proj-card-top">
+                                <div class="proj-card-name">${esc(r.clientName || '未命名客户')}</div>
+                                <span class="badge">${esc(DDApi.statusLabel(r.status))}</span>
+                            </div>
+                            <div class="proj-card-meta">
+                                <span>${esc(r.projectNo)}</span>
+                                <span>${esc(r.channel)}</span>
+                            </div>
+                            <button type="button" class="btn btn-ghost btn-sm btn-block copy-btn" data-token="${esc(r.accessToken)}">复制 Magic link</button>
+                        </article>
+                    `).join('')}</div>`;
+                    wrap.querySelectorAll('.copy-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const link = DDApi.buildMagicLink(config, btn.dataset.token);
+                            navigator.clipboard?.writeText(link);
+                            btn.textContent = '已复制';
+                            setTimeout(() => { btn.textContent = '复制 Magic link'; }, 1500);
+                        });
+                    });
+                } catch (err) {
+                    wrap.innerHTML = `<p class="err">${esc(err.message)}</p>`;
+                }
+            }
+
+            function switchTab(name) {
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    const on = b.dataset.tab === name;
+                    b.classList.toggle('active', on);
+                    if (on) b.setAttribute('aria-current', 'page');
+                    else b.removeAttribute('aria-current');
+                });
+                document.getElementById('tab-projects').classList.toggle('hidden', name !== 'projects');
+                document.getElementById('tab-partnerLinks').classList.toggle('hidden', name !== 'partnerLinks');
+                document.getElementById('tab-approvals').classList.toggle('hidden', name !== 'approvals');
+                if (name === 'approvals') refreshApplications();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function switchSubtab(name) {
+                document.querySelectorAll('.subtab-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.subtab === name);
+                });
+                document.getElementById('subtab-list').classList.toggle('hidden', name !== 'list');
+                document.getElementById('subtab-create').classList.toggle('hidden', name !== 'create');
+            }
+
+            function showLogin() {
+                document.body.classList.add('is-login');
+                document.body.classList.remove('is-dash');
+                loginPanel.classList.remove('hidden');
+                dashPanel.classList.add('hidden');
+            }
+
+            async function showDash() {
+                document.body.classList.remove('is-login');
+                document.body.classList.add('is-dash');
+                loginPanel.classList.add('hidden');
+                dashPanel.classList.remove('hidden');
+                const u = session.user || {};
+                document.getElementById('userLabel').textContent = (u.email || '已登录') + (u.role ? ' · ' + u.role : '');
+                switchTab('projects');
+                switchSubtab('list');
+                // 先出界面再拉数据，避免登录后白等像卡住
+                refreshProjects();
+                loadPartnersForSelect();
+            }
+
+            function withTimeout(promise, ms, message) {
+                return new Promise((resolve, reject) => {
+                    const t = setTimeout(() => reject(new Error(message)), ms);
+                    Promise.resolve(promise).then(
+                        (v) => { clearTimeout(t); resolve(v); },
+                        (e) => { clearTimeout(t); reject(e); }
+                    );
+                });
+            }
+
+            function tokenOf(s) { return s && (s.accessToken || s.access_token); }
+            function isConfigError(code) {
+                return code === 'supabase_not_configured' || code === 'platform_not_configured' || code === 'tencent_not_configured';
+            }
+            function friendlyLoginError(err) {
+                const msg = String(err && err.message || err || '');
+                if (isConfigError(msg)) {
+                    return '请先配置 config.public.json（Supabase url + anonKey）';
+                }
+                // 浏览器网络层失败（代理/Fake-IP/断网）常见文案
+                if (/failed to fetch|networkerror|load failed|err_connection|ssl|tls|timeout|超时/i.test(msg)) {
+                    return '连不上 Supabase（Failed to fetch）。请检查：代理/VPN 是否劫持了 *.supabase.co，可对本域名直连或临时关代理后重试。';
+                }
+                if (/invalid.?login|invalid.?credentials|email.?not.?confirmed|invalid_grant/i.test(msg)) {
+                    return '邮箱或密码错误，或邮箱未 Confirm。';
+                }
+                return msg || '登录失败';
+            }
+            function loadSession() {
+                try {
+                    const raw = JSON.parse(localStorage.getItem(SESSION_KEY));
+                    if (!raw) return null;
+                    return raw.accessToken ? raw : DDApi.auth.normalizeSession(raw, raw.provider || 'supabase');
+                } catch { return null; }
+            }
+            function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+            function esc(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+        })();
+    </script>
+</body>
+</html>

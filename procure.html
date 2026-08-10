@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DD design · 采购工具</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    :root {
+      --bg: #f4f2ee;
+      --surface: #fffdf9;
+      --text: #1c1917;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --accent: #0f766e;
+      --low: #ecfdf5;
+      --warn: #fff7ed;
+      --bad: #fef2f2;
+      --req: #fffbeb;
+      --req-strong: #fef3c7;
+      --param-w: 120px;
+      --owner-w: 200px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px 18px 48px; }
+    .wrap.wide { max-width: 100%; }
+    .nav { margin-bottom: 12px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .nav a { color: var(--muted); text-decoration: none; font-size: 12px; }
+    .nav a:hover, .nav a.active { color: var(--accent); }
+    .nav .brand { font-weight: 700; color: var(--text); margin-right: 4px; }
+    h1 { font-size: 22px; font-weight: 650; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); margin: 6px 0 16px; max-width: 920px; }
+    .gate {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 28px 20px; max-width: 420px; margin: 32px auto; text-align: center;
+    }
+    .gate h2 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .gate p { color: var(--muted); font-size: 13px; margin-bottom: 18px; line-height: 1.5; }
+    .gate .btn { justify-content: center; margin: 0 auto; }
+    .toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 14px;
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px; background: #fff;
+      border: 1px solid var(--line); font-size: 12px; color: var(--muted);
+    }
+    .pill strong { color: var(--accent); font-weight: 650; }
+    .btn, .btn-toggle {
+      appearance: none; border: 1px solid #134e4a; background: #134e4a; color: #fff;
+      border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 650;
+      cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn:hover, .btn-toggle:hover { background: #0f766e; border-color: #0f766e; }
+    .btn-ghost {
+      background: #fff; color: #134e4a;
+    }
+    .task-list { display: flex; flex-direction: column; gap: 10px; }
+    .task-card {
+      display: block; text-decoration: none; color: inherit;
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 14px 16px; transition: border-color .15s;
+    }
+    .task-card:hover { border-color: #134e4a; }
+    .task-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .task-title { font-size: 15px; font-weight: 700; }
+    .task-blurb { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .task-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .badge {
+      font-size: 11px; padding: 2px 8px; border-radius: 999px;
+      background: #ecfdf5; color: #115e59; font-weight: 650;
+    }
+    .badge.muted { background: #f5f5f4; color: var(--muted); }
+    .scroll-hint {
+      color: var(--muted); font-size: 12px; margin: -4px 0 10px;
+    }
+    .scroll {
+      overflow: auto; border: 1px solid var(--line); border-radius: 12px;
+      background: var(--surface); max-height: calc(100vh - 200px);
+      -webkit-overflow-scrolling: touch;
+    }
+    table {
+      border-collapse: separate; border-spacing: 0;
+      width: max-content; min-width: 100%;
+    }
+    th, td {
+      padding: 10px 12px; border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line); vertical-align: top;
+      text-align: left; white-space: normal;
+      background-clip: padding-box;
+    }
+    /* 可滚动的厂家列：固定宽度，便于左右滑 */
+    th.vendor-col, td.vendor-col {
+      min-width: 180px; max-width: 240px; width: 200px;
+    }
+    th {
+      position: sticky; top: 0; z-index: 3;
+      background: #fafaf9; color: var(--muted); font-weight: 600;
+      font-size: 11px; letter-spacing: 0.02em;
+    }
+    th.vendor-low { background: #d1fae5; color: #065f46; }
+    th.vendor-bad { background: #fee2e2; color: #991b1b; }
+    th.vendor-warn { background: #ffedd5; color: #9a3412; }
+
+    /* 冻结：参数 + 业主需求（左右滑时不动） */
+    th.param, td.param {
+      position: sticky; left: 0; z-index: 5;
+      background: #fafaf9;
+      min-width: var(--param-w); max-width: var(--param-w); width: var(--param-w);
+      font-weight: 650; color: var(--muted); white-space: nowrap;
+    }
+    th.param {
+      top: 0; z-index: 9; color: var(--text);
+      box-shadow: 1px 0 0 var(--line);
+    }
+    td.param { box-shadow: 1px 0 0 var(--line); }
+    /* 仅锁定参数列时，右缘阴影提示可横滑 */
+    th.param-only, td.param-only {
+      box-shadow: 6px 0 10px -4px rgba(28, 25, 23, 0.18);
+    }
+    th.owner, td.owner {
+      position: sticky; left: var(--param-w); z-index: 5;
+      background: var(--req);
+      min-width: var(--owner-w); max-width: var(--owner-w); width: var(--owner-w);
+      color: #92400e;
+      /* 冻结区右缘阴影，提示后方可滑动 */
+      box-shadow: 6px 0 10px -4px rgba(28, 25, 23, 0.18);
+    }
+    th.owner {
+      top: 0; z-index: 9;
+      background: var(--req-strong); color: #78350f;
+    }
+
+    /* 厂家×参数：冻结 厂家 + 业主需求 */
+    th.vendor-sticky, td.vendor-sticky {
+      position: sticky; left: 0; z-index: 5;
+      background: var(--surface);
+      min-width: 140px; max-width: 140px; width: 140px;
+      font-weight: 650; box-shadow: 1px 0 0 var(--line);
+    }
+    th.vendor-sticky { top: 0; z-index: 9; background: #fafaf9; }
+    th.owner-vend, td.owner-vend {
+      position: sticky; left: 140px; z-index: 5;
+      background: var(--req);
+      min-width: var(--owner-w); max-width: 240px; width: var(--owner-w);
+      color: #92400e;
+      box-shadow: 6px 0 10px -4px rgba(28, 25, 23, 0.18);
+    }
+    th.owner-vend {
+      top: 0; z-index: 9;
+      background: var(--req-strong); color: #78350f;
+    }
+
+    tr.price-row td { background: #f0fdfa; }
+    tr.price-row td.param { background: #ccfbf1; color: #115e59; }
+    tr.price-row td.owner { background: #ecfdf5; }
+    td.price { font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
+    td.price.em { color: var(--accent); font-size: 14px; }
+    td.cell-low { background: var(--low); }
+    tr.lowest td.vendor-sticky { background: var(--low); }
+    tr.conflict td.vendor-sticky { background: var(--bad); }
+    tr.over td.vendor-sticky { background: var(--warn); }
+    .tag {
+      display: inline-block; margin-left: 6px; padding: 1px 6px;
+      border-radius: 4px; font-size: 10px; background: #ccfbf1; color: #115e59;
+    }
+    .tag.bad { background: #fee2e2; color: #991b1b; }
+    .tag.warn { background: #ffedd5; color: #9a3412; }
+    .err { color: #b91c1c; margin-top: 20px; }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
+    .empty { color: var(--muted); padding: 24px 0; }
+
+    /* 视图切换 */
+    .view-switch {
+      display: inline-flex; flex-wrap: wrap; gap: 0;
+      border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+      background: #fff;
+    }
+    .view-switch button {
+      appearance: none; border: none; background: transparent;
+      padding: 7px 12px; font-size: 12px; font-weight: 650; color: var(--muted);
+      cursor: pointer; border-right: 1px solid var(--line);
+    }
+    .view-switch button:last-child { border-right: none; }
+    .view-switch button.active { background: #134e4a; color: #fff; }
+
+    /* 业主需求：独立置顶 */
+    .owner-panel {
+      background: var(--req); border: 1px solid #fcd34d; border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 12px;
+    }
+    .owner-panel-title {
+      font-size: 13px; font-weight: 750; color: #78350f; margin-bottom: 8px;
+    }
+    .owner-panel-summary {
+      font-size: 12px; color: #92400e; margin-bottom: 10px; line-height: 1.45;
+    }
+    .owner-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 6px 10px;
+    }
+    .owner-item {
+      display: grid; grid-template-columns: 72px 1fr; gap: 6px;
+      font-size: 11px; align-items: start;
+    }
+    .owner-item .k { color: #a16207; font-weight: 650; }
+    .owner-item .v { color: #78350f; }
+
+    /* 厂家卡片：紧凑 */
+    .vendor-section-title {
+      font-size: 12px; font-weight: 700; color: var(--muted); margin: 4px 0 8px;
+    }
+    .vendor-cards { display: flex; flex-direction: column; gap: 8px; }
+    .vcard {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+      overflow: hidden;
+    }
+    .vcard.tone-low { border-color: #86efac; }
+    .vcard.tone-bad { border-color: #fca5a5; }
+    .vcard.tone-warn { border-color: #fdba74; }
+    .vcard-head {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center;
+      padding: 8px 12px;
+    }
+    .vcard.tone-low .vcard-head { background: var(--low); }
+    .vcard.tone-bad .vcard-head { background: var(--bad); }
+    .vcard.tone-warn .vcard-head { background: var(--warn); }
+    .vcard-name { font-size: 14px; font-weight: 700; line-height: 1.2; }
+    .vcard-series {
+      color: var(--muted); font-size: 11px; margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw;
+    }
+    .vcard-price {
+      text-align: right; font-size: 17px; font-weight: 750; color: var(--accent);
+      font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.15;
+    }
+    .vcard-price small {
+      display: block; font-size: 10px; color: var(--muted); font-weight: 600;
+      max-width: 140px; overflow: hidden; text-overflow: ellipsis;
+    }
+    .vcard-primary {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0; border-top: 1px solid var(--line); padding: 0;
+    }
+    .kv {
+      display: grid; grid-template-columns: 64px 1fr; gap: 4px;
+      padding: 5px 10px; border-bottom: 1px solid #f5f5f4; font-size: 11px;
+      align-items: baseline;
+    }
+    .kv:nth-child(odd) { border-right: 1px solid #f5f5f4; }
+    .kv.is-price .kv-v { font-weight: 750; color: var(--accent); font-size: 12px; }
+    .kv-k { color: var(--muted); font-weight: 650; }
+    .kv-v { color: var(--text); min-width: 0; word-break: break-word; }
+    .vcard-more { border-top: 1px solid var(--line); }
+    .vcard-more summary {
+      list-style: none; cursor: pointer; padding: 6px 12px; font-size: 11px;
+      font-weight: 700; color: #134e4a; user-select: none;
+    }
+    .vcard-more summary::-webkit-details-marker { display: none; }
+    .vcard-more summary::after { content: ' ▾'; }
+    .vcard-more[open] summary::after { content: ' ▴'; }
+    .vcard-more-body {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: 0 0 6px;
+    }
+    .more-row {
+      display: grid; grid-template-columns: 64px 1fr; gap: 4px;
+      padding: 4px 10px; font-size: 11px; border-top: 1px solid #f5f5f4;
+    }
+    .more-row:nth-child(odd) { border-right: 1px solid #f5f5f4; }
+    .more-k { color: var(--muted); font-weight: 650; }
+    @media (max-width: 560px) {
+      .vcard-primary, .vcard-more-body { grid-template-columns: 1fr; }
+      .kv:nth-child(odd), .more-row:nth-child(odd) { border-right: none; }
+      .owner-grid { grid-template-columns: 1fr; }
+    }
+
+    /* 小程序列表对比（厂家行卡片 · 展开明细） */
+    .mp-list { display: flex; flex-direction: column; gap: 0; }
+    .mp-row {
+      background: var(--surface); border: 1px solid var(--line);
+      border-bottom: none; cursor: pointer;
+    }
+    .mp-row:first-child { border-radius: 12px 12px 0 0; }
+    .mp-row:last-child { border-bottom: 1px solid var(--line); border-radius: 0 0 12px 12px; }
+    .mp-row.lowest { background: var(--low); }
+    .mp-row.open { background: #fafaf9; }
+    .mp-main {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; padding: 12px 14px;
+    }
+    .mp-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .mp-rank {
+      width: 22px; height: 22px; border-radius: 50%; background: #e7e5e4;
+      color: var(--muted); font-size: 11px; font-weight: 750;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .mp-row.lowest .mp-rank { background: #bbf7d0; color: #166534; }
+    .mp-supplier { font-size: 14px; font-weight: 700; }
+    .mp-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .mp-price {
+      font-size: 16px; font-weight: 750; color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .mp-caret { color: var(--muted); font-size: 12px; }
+    .mp-factors {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0; border-top: 1px solid #f5f5f4; padding: 0 4px 8px;
+    }
+    .mp-factor {
+      padding: 6px 8px; font-size: 11px; color: var(--text);
+      border-right: 1px solid #f5f5f4; min-height: 36px;
+    }
+    .mp-factor:last-child { border-right: none; }
+    .mp-factor-k { display: block; color: var(--muted); font-size: 10px; margin-bottom: 2px; }
+    .mp-expand {
+      display: none; border-top: 1px solid var(--line);
+      padding: 8px 14px 12px; background: #fff;
+    }
+    .mp-row.open .mp-expand { display: block; }
+    .mp-kv {
+      display: grid; grid-template-columns: 96px 1fr; gap: 8px;
+      padding: 6px 0; border-bottom: 1px solid #f5f5f4; font-size: 12px;
+    }
+    .mp-kv:last-child { border-bottom: none; }
+    .mp-kv .k { color: var(--muted); font-weight: 650; }
+    .mp-kv .v.price { color: var(--accent); font-weight: 750; }
+    .mp-expand-hint { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    @media (max-width: 560px) {
+      .mp-factors { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="wrap">
+    <nav class="nav">
+      <span class="brand">采购工具</span>
+      <a href="procure.html" class="active" id="navHome">在询任务</a>
+      <a href="admin.html">团队后台</a>
+      <a href="inquiry-view.html">询价页</a>
+      <a href="shop.html">选品中心</a>
+    </nav>
+    <div id="app">加载中…</div>
+  </div>
+  <script>
+    (function () {
+      var SESSION_KEY = 'dd_design_session';
+      var params = new URLSearchParams(location.search);
+      var key = params.get('key') || '';
+      var app = document.getElementById('app');
+      var wrap = document.getElementById('wrap');
+      var SKIP_KEYS = {
+        supplier: 1, id: 1, partyId: 1, fitOwner: 1,
+        motorLight: 1, shadePrice: 1, customerReq: 1
+      };
+
+      function hasTeamSession() {
+        try {
+          var raw = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+          return !!(raw && (raw.accessToken || raw.access_token));
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function showLoginGate() {
+        var next = 'procure.html' + (location.search || '') + (location.hash || '');
+        var loginHref = 'admin.html?next=' + encodeURIComponent(next);
+        document.title = 'DD design · 采购工具（需登录）';
+        app.innerHTML =
+          '<div class="gate">' +
+          '<h2>仅团队可见</h2>' +
+          '<p>采购任务与内地产品对照表不对公开放开。<br>请先用团队账号登录后再查看。</p>' +
+          '<a class="btn" href="' + loginHref + '">去团队后台登录</a>' +
+          '</div>';
+      }
+
+      function esc(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function money(n) {
+        if (n == null || n === '' || Number.isNaN(Number(n))) return '—';
+        return '¥' + Number(n).toLocaleString('zh-CN');
+      }
+
+      if (!hasTeamSession()) {
+        showLoginGate();
+        return;
+      }
+
+      if (!key) {
+        renderTaskList();
+      } else {
+        renderMatrix(key);
+      }
+
+      function renderTaskList() {
+        document.title = 'DD design · 采购工具';
+        wrap.classList.remove('wide');
+        fetch('assets/data/procure-matrices/tasks.json', { cache: 'no-store' })
+          .then(function (r) {
+            if (!r.ok) throw new Error('load_failed');
+            return r.json();
+          })
+          .then(function (data) {
+            var tasks = (data.tasks || []).filter(function (t) {
+              return t.always !== false || t.demo === true;
+            });
+            // 演示任务默认也展示（H5 内部对照用）
+            var cards = tasks
+              .map(function (t) {
+                return (
+                  '<a class="task-card" href="procure.html?key=' +
+                  encodeURIComponent(t.matrixKey) +
+                  '">' +
+                  '<div class="task-top">' +
+                  '<div class="task-title">' +
+                  esc(t.title) +
+                  '</div>' +
+                  '<span class="badge">' +
+                  esc(t.statusLabel || '询价中') +
+                  '</span>' +
+                  '</div>' +
+                  '<div class="task-blurb">' +
+                  esc(t.blurb || '') +
+                  '</div>' +
+                  '<div class="task-meta">' +
+                  '<span class="badge muted">决策表 ' +
+                  esc(t.matrixKey) +
+                  '</span>' +
+                  (t.sourceFile
+                    ? '<span class="badge muted">' + esc(t.sourceFile) + '</span>'
+                    : '') +
+                  '</div>' +
+                  '</a>'
+                );
+              })
+              .join('');
+
+            app.innerHTML =
+              '<h1>' +
+              esc(data.title || '采购工具') +
+              '</h1>' +
+              '<p class="sub">' +
+              esc(data.subtitle || '在询任务 · 点开进入决策表') +
+              '</p>' +
+              (cards
+                ? '<div class="task-list">' + cards + '</div>'
+                : '<p class="empty">暂无在询任务</p>') +
+              '<p class="hint">对齐小程序「工具 → 采购工具」任务列表 · 决策表支持业主需求列与行列切换</p>';
+          })
+          .catch(function () {
+            app.innerHTML =
+              '<p class="err">无法加载任务列表</p>' +
+              '<p class="hint">请用静态服务打开本站，例如 python -m http.server 5501</p>';
+          });
+      }
+
+      function renderMatrix(matrixKey) {
+        document.title = 'DD design · 采购决策表';
+        wrap.classList.add('wide');
+        var LAYOUT_KEY = 'dd_procure_matrix_layout_' + matrixKey;
+        var VIEWS = ['vendor-cards', 'mp-list', 'param-x-vendor', 'vendor-x-param'];
+        var VIEW_LABELS = {
+          'vendor-cards': '厂家卡片',
+          'mp-list': '小程序列表',
+          'param-x-vendor': '参数×厂家',
+          'vendor-x-param': '厂家×参数'
+        };
+        var matrixCache = null;
+        var viewLayout = 'vendor-cards';
+
+        fetch(
+          'assets/data/procure-matrices/' + encodeURIComponent(matrixKey) + '.json',
+          { cache: 'no-store' }
+        )
+          .then(function (r) {
+            if (!r.ok) throw new Error('load_failed');
+            return r.json();
+          })
+          .then(function (matrix) {
+            matrixCache = matrix;
+            var saved = localStorage.getItem(LAYOUT_KEY);
+            if (VIEWS.indexOf(saved) >= 0) {
+              viewLayout = saved;
+            } else if (VIEWS.indexOf(matrix.layout) >= 0) {
+              viewLayout = matrix.layout;
+            } else {
+              viewLayout = 'vendor-cards';
+            }
+            paint();
+          })
+          .catch(function () {
+            app.innerHTML =
+              '<p class="err">无法加载决策表</p>' +
+              '<p class="hint"><a href="procure.html">返回任务列表</a></p>';
+          });
+
+        function vendorTone(row) {
+          if (row.tag === '主谈' || row.isLowest) return 'low';
+          if (row.tag === '冲突' || row.fitOwner === 'low') return 'bad';
+          if (row.tag === '超配' || row.fitOwner === 'medium') return 'warn';
+          return '';
+        }
+
+        function tagClass(tone) {
+          if (tone === 'bad') return 'tag bad';
+          if (tone === 'warn') return 'tag warn';
+          return 'tag';
+        }
+
+        function formatCell(col, row) {
+          var raw = row[col.key];
+          if (col.type === 'price' || /Price$/.test(col.key)) return money(raw);
+          if (raw == null || raw === '') return '—';
+          return String(raw);
+        }
+
+        function paramColumns(matrix) {
+          return (matrix.columns || []).filter(function (c) {
+            return c && c.key && !SKIP_KEYS[c.key];
+          });
+        }
+
+        function ownerValue(matrix, colKey) {
+          var map = matrix.ownerReqByKey || {};
+          if (map[colKey] != null && map[colKey] !== '') return String(map[colKey]);
+          return '—';
+        }
+
+        function prepareVendors(matrix) {
+          var vendors = (matrix.rows || []).slice().sort(function (a, b) {
+            var pa = a.totalPrice != null ? Number(a.totalPrice) : Infinity;
+            var pb = b.totalPrice != null ? Number(b.totalPrice) : Infinity;
+            if (pa !== pb) return pa - pb;
+            return String(a.supplier || '').localeCompare(String(b.supplier || ''), 'zh');
+          });
+          var min = null;
+          vendors.forEach(function (r) {
+            if (r.totalPrice != null && Number(r.totalPrice) > 0) {
+              var n = Number(r.totalPrice);
+              if (min == null || n < min) min = n;
+            }
+          });
+          vendors.forEach(function (r) {
+            r.isLowest = min != null && Number(r.totalPrice) === min;
+          });
+          return { vendors: vendors, min: min };
+        }
+
+        function renderParamXVendor(matrix, vendors) {
+          var params = paramColumns(matrix);
+          // 参数×厂家：表内不再重复「业主需求」列（顶部已有业主需求摘要）
+          var head =
+            '<th class="param param-only">参数</th>' +
+            vendors
+              .map(function (v) {
+                var tone = vendorTone(v);
+                var cls = 'vendor-col' + (tone ? ' vendor-' + tone : '');
+                var tag = v.tag
+                  ? '<span class="' + tagClass(tone) + '">' + esc(v.tag) + '</span>'
+                  : v.isLowest
+                    ? '<span class="tag">最低</span>'
+                    : '';
+                return (
+                  '<th class="' + cls + '">' + esc(v.supplier || '未命名') + tag + '</th>'
+                );
+              })
+              .join('');
+          var body = params
+            .map(function (col) {
+              var isPrice = col.type === 'price' || /Price$/.test(col.key);
+              var trCls = isPrice && col.emphasize ? 'price-row' : '';
+              var cells = vendors
+                .map(function (v) {
+                  var cls = ['vendor-col'];
+                  if (isPrice) cls.push('price');
+                  if (col.emphasize) cls.push('em');
+                  if (v.isLowest && isPrice) cls.push('cell-low');
+                  return (
+                    '<td class="' +
+                    cls.join(' ') +
+                    '">' +
+                    esc(formatCell(col, v)) +
+                    '</td>'
+                  );
+                })
+                .join('');
+              return (
+                '<tr class="' +
+                trCls +
+                '"><td class="param param-only">' +
+                esc(col.label) +
+                '</td>' +
+                cells +
+                '</tr>'
+              );
+            })
+            .join('');
+          return { head: head, body: body };
+        }
+
+        function renderVendorXParam(matrix, vendors) {
+          var params = paramColumns(matrix);
+          var summary = matrix.ownerReqSummary || '—';
+          var head =
+            '<th class="vendor-sticky">厂家</th><th class="owner-vend">业主需求</th>' +
+            params
+              .map(function (col) {
+                return '<th class="vendor-col">' + esc(col.label) + '</th>';
+              })
+              .join('');
+          var body = vendors
+            .map(function (v) {
+              var tone = vendorTone(v);
+              var trCls =
+                tone === 'low'
+                  ? 'lowest'
+                  : tone === 'bad'
+                    ? 'conflict'
+                    : tone === 'warn'
+                      ? 'over'
+                      : '';
+              var tag = v.tag
+                ? '<span class="' + tagClass(tone) + '">' + esc(v.tag) + '</span>'
+                : v.isLowest
+                  ? '<span class="tag">最低</span>'
+                  : '';
+              var cells = params
+                .map(function (col) {
+                  var isPrice = col.type === 'price' || /Price$/.test(col.key);
+                  var cls = ['vendor-col'];
+                  if (isPrice) cls.push('price');
+                  if (col.emphasize) cls.push('em');
+                  if (v.isLowest && isPrice) cls.push('cell-low');
+                  return (
+                    '<td class="' +
+                    cls.join(' ') +
+                    '">' +
+                    esc(formatCell(col, v)) +
+                    '</td>'
+                  );
+                })
+                .join('');
+              return (
+                '<tr class="' +
+                trCls +
+                '"><td class="vendor-sticky">' +
+                esc(v.supplier || '未命名') +
+                tag +
+                '</td><td class="owner-vend">' +
+                esc(summary) +
+                '</td>' +
+                cells +
+                '</tr>'
+              );
+            })
+            .join('');
+          return { head: head, body: body };
+        }
+
+        function primaryKeysOf(matrix) {
+          var keys = matrix.cardPrimaryKeys || matrix.filterColumns || [];
+          var out = [];
+          keys.forEach(function (k) {
+            if (k && k !== 'supplier' && out.indexOf(k) < 0) out.push(k);
+          });
+          if (out.indexOf('totalPrice') < 0) out.push('totalPrice');
+          return out;
+        }
+
+        function colByKey(matrix, key) {
+          var found = null;
+          (matrix.columns || []).forEach(function (c) {
+            if (c.key === key) found = c;
+          });
+          return found || { key: key, label: key };
+        }
+
+        function renderOwnerPanel(matrix) {
+          var primary = primaryKeysOf(matrix).filter(function (k) {
+            return !/Price$/.test(k) && k !== 'totalPrice' && k !== 'taxNote';
+          });
+          var items = primary
+            .map(function (key) {
+              var col = colByKey(matrix, key);
+              var val = ownerValue(matrix, key);
+              if (!val || val === '—') return '';
+              return (
+                '<div class="owner-item"><span class="k">' +
+                esc(col.label) +
+                '</span><span class="v">' +
+                esc(val) +
+                '</span></div>'
+              );
+            })
+            .filter(Boolean)
+            .join('');
+          return (
+            '<section class="owner-panel">' +
+            '<div class="owner-panel-title">业主需求</div>' +
+            (matrix.ownerReqSummary
+              ? '<div class="owner-panel-summary">' +
+                esc(matrix.ownerReqSummary) +
+                '</div>'
+              : '') +
+            (items ? '<div class="owner-grid">' + items + '</div>' : '') +
+            '</section>'
+          );
+        }
+
+        function renderVendorCards(matrix, vendors) {
+          var primary = primaryKeysOf(matrix);
+          var primarySet = {};
+          primary.forEach(function (k) {
+            primarySet[k] = 1;
+          });
+          var moreCols = paramColumns(matrix).filter(function (c) {
+            return !primarySet[c.key];
+          });
+
+          var cards = vendors
+            .map(function (v, idx) {
+              var tone = vendorTone(v);
+              var tag = v.tag
+                ? '<span class="' + tagClass(tone) + '">' + esc(v.tag) + '</span>'
+                : v.isLowest
+                  ? '<span class="tag">最低</span>'
+                  : '';
+              var primaryRows = primary
+                .map(function (key) {
+                  var col = colByKey(matrix, key);
+                  var isPrice = col.type === 'price' || /Price$/.test(key);
+                  return (
+                    '<div class="kv' +
+                    (isPrice ? ' is-price' : '') +
+                    '"><span class="kv-k">' +
+                    esc(col.label) +
+                    '</span><span class="kv-v">' +
+                    esc(formatCell(col, v)) +
+                    '</span></div>'
+                  );
+                })
+                .join('');
+
+              var moreRows = moreCols
+                .map(function (col) {
+                  return (
+                    '<div class="more-row"><span class="more-k">' +
+                    esc(col.label) +
+                    '</span><span>' +
+                    esc(formatCell(col, v)) +
+                    '</span></div>'
+                  );
+                })
+                .join('');
+
+              return (
+                '<article class="vcard tone-' +
+                (tone || 'none') +
+                '" data-id="' +
+                esc(v.id || String(idx)) +
+                '">' +
+                '<div class="vcard-head">' +
+                '<div style="min-width:0">' +
+                '<div class="vcard-name">' +
+                esc(v.supplier || '未命名') +
+                ' ' +
+                tag +
+                '</div>' +
+                '<div class="vcard-series">' +
+                esc(v.series || v.schemeType || '') +
+                '</div>' +
+                '</div>' +
+                '<div class="vcard-price">' +
+                esc(money(v.totalPrice)) +
+                '<small>' +
+                esc(v.taxNote || '合计') +
+                '</small>' +
+                '</div>' +
+                '</div>' +
+                '<div class="vcard-primary">' +
+                primaryRows +
+                '</div>' +
+                (moreRows
+                  ? '<details class="vcard-more"><summary>更多（' +
+                    moreCols.length +
+                    '）</summary><div class="vcard-more-body">' +
+                    moreRows +
+                    '</div></details>'
+                  : '') +
+                '</article>'
+              );
+            })
+            .join('');
+
+          return (
+            renderOwnerPanel(matrix) +
+            '<div class="vendor-section-title">厂家报价对比</div>' +
+            '<div class="vendor-cards">' +
+            cards +
+            '</div>'
+          );
+        }
+
+        /** 对齐小程序 matrix 页：厂家列表 + 4 格主参数 + 点击展开明细 */
+        function previewKeysOf(matrix) {
+          var keys = matrix.filterColumns || matrix.cardPrimaryKeys || [];
+          var out = [];
+          keys.forEach(function (k) {
+            if (
+              !k ||
+              k === 'supplier' ||
+              k === 'totalPrice' ||
+              k === 'bodyPrice' ||
+              k === 'coolingPrice' ||
+              /Price$/.test(k)
+            ) {
+              return;
+            }
+            if (out.indexOf(k) < 0) out.push(k);
+          });
+          return out.slice(0, 4);
+        }
+
+        function renderMpList(matrix, vendors) {
+          var pins = previewKeysOf(matrix);
+          while (pins.length < 4) pins.push('');
+          var list = vendors
+            .map(function (v, idx) {
+              var tone = vendorTone(v);
+              var tag = v.tag
+                ? '<span class="' + tagClass(tone) + '">' + esc(v.tag) + '</span>'
+                : v.isLowest
+                  ? '<span class="tag">最低</span>'
+                  : '';
+              var factors = pins
+                .map(function (key) {
+                  if (!key) {
+                    return '<div class="mp-factor"><span class="mp-factor-k">—</span>—</div>';
+                  }
+                  var col = colByKey(matrix, key);
+                  return (
+                    '<div class="mp-factor"><span class="mp-factor-k">' +
+                    esc(col.label) +
+                    '</span>' +
+                    esc(formatCell(col, v)) +
+                    '</div>'
+                  );
+                })
+                .join('');
+              var details = paramColumns(matrix)
+                .map(function (col) {
+                  var isPrice = col.type === 'price' || /Price$/.test(col.key);
+                  return (
+                    '<div class="mp-kv"><span class="k">' +
+                    esc(col.label) +
+                    '</span><span class="v' +
+                    (isPrice ? ' price' : '') +
+                    '">' +
+                    esc(formatCell(col, v)) +
+                    '</span></div>'
+                  );
+                })
+                .join('');
+              return (
+                '<div class="mp-row' +
+                (v.isLowest ? ' lowest' : '') +
+                '" data-mp-id="' +
+                esc(v.id || String(idx)) +
+                '">' +
+                '<div class="mp-main">' +
+                '<div class="mp-left">' +
+                '<span class="mp-rank">' +
+                (idx + 1) +
+                '</span>' +
+                '<span class="mp-supplier">' +
+                esc(v.supplier || '未命名') +
+                ' ' +
+                tag +
+                '</span>' +
+                '</div>' +
+                '<div class="mp-right">' +
+                '<span class="mp-price">' +
+                esc(money(v.totalPrice)) +
+                '</span>' +
+                '<span class="mp-caret">▾</span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="mp-factors">' +
+                factors +
+                '</div>' +
+                '<div class="mp-expand">' +
+                '<div class="mp-expand-hint">明细参数（对齐小程序展开）</div>' +
+                details +
+                '</div>' +
+                '</div>'
+              );
+            })
+            .join('');
+          return (
+            renderOwnerPanel(matrix) +
+            '<div class="vendor-section-title">小程序列表对比 · 总价从低到高 · 点击展开</div>' +
+            '<div class="mp-list" id="mpList">' +
+            list +
+            '</div>'
+          );
+        }
+
+        function paint() {
+          var matrix = matrixCache;
+          if (!matrix) return;
+          document.title = 'DD design · ' + (matrix.title || matrixKey);
+          var prep = prepareVendors(matrix);
+          var vendors = prep.vendors;
+          var min = prep.min;
+
+          var switchHtml =
+            '<div class="view-switch" id="viewSwitch">' +
+            VIEWS.map(function (v) {
+              return (
+                '<button type="button" data-view="' +
+                v +
+                '"' +
+                (v === viewLayout ? ' class="active"' : '') +
+                '>' +
+                esc(VIEW_LABELS[v]) +
+                '</button>'
+              );
+            }).join('') +
+            '</div>';
+
+          var bodyHtml = '';
+          var hint = '';
+          if (viewLayout === 'vendor-cards') {
+            bodyHtml = renderVendorCards(matrix, vendors);
+            hint = '业主需求独立置顶 · 下方厂家卡片紧凑对比 · 更多可折叠';
+          } else if (viewLayout === 'mp-list') {
+            bodyHtml = renderMpList(matrix, vendors);
+            hint = '对齐小程序决策表：厂家列表 · 4 格主参数 · 点击展开明细';
+          } else {
+            var table =
+              viewLayout === 'vendor-x-param'
+                ? renderVendorXParam(matrix, vendors)
+                : renderParamXVendor(matrix, vendors);
+            var freezeHint =
+              viewLayout === 'vendor-x-param'
+                ? '左侧已锁定「厂家 + 业主需求」，向右滑动查看各参数'
+                : '左侧已锁定「参数」，向右滑动查看各厂家（业主需求见上方）';
+            var ownerBanner = matrix.ownerReqSummary
+              ? '<div class="owner-panel" style="margin-bottom:10px"><div class="owner-panel-title">业主需求</div><div class="owner-panel-summary">' +
+                esc(matrix.ownerReqSummary) +
+                '</div></div>'
+              : '';
+            bodyHtml =
+              ownerBanner +
+              '<p class="scroll-hint">' +
+              esc(freezeHint) +
+              '</p>' +
+              '<div class="scroll"><table><thead><tr>' +
+              table.head +
+              '</tr></thead><tbody>' +
+              table.body +
+              '</tbody></table></div>';
+            hint = '冻结列对照业主需求 · 厂家列可横向滑动';
+          }
+
+          app.innerHTML =
+            '<div class="toolbar">' +
+            '<a class="btn btn-ghost" href="procure.html">← 任务列表</a>' +
+            switchHtml +
+            '<span class="pill">口径 <strong>' +
+            esc(matrix.compareClass || '—') +
+            '</strong></span>' +
+            '<span class="pill">厂家 <strong>' +
+            vendors.length +
+            '</strong></span>' +
+            '<span class="pill">最低合计 <strong>' +
+            money(min) +
+            '</strong></span>' +
+            '</div>' +
+            '<h1>' +
+            esc(matrix.title || matrixKey) +
+            '</h1>' +
+            '<p class="sub">' +
+            esc(matrix.subtitle || '') +
+            '</p>' +
+            bodyHtml +
+            '<p class="hint">采购工具 H5 · ' +
+            esc(hint) +
+            ' · key=' +
+            esc(matrixKey) +
+            '</p>';
+
+          var sw = document.getElementById('viewSwitch');
+          if (sw) {
+            sw.addEventListener('click', function (e) {
+              var btn = e.target.closest('button[data-view]');
+              if (!btn) return;
+              var next = btn.getAttribute('data-view');
+              if (VIEWS.indexOf(next) < 0 || next === viewLayout) return;
+              viewLayout = next;
+              try {
+                localStorage.setItem(LAYOUT_KEY, viewLayout);
+              } catch (err) { /* ignore */ }
+              paint();
+            });
+          }
+
+          var mpList = document.getElementById('mpList');
+          if (mpList) {
+            mpList.addEventListener('click', function (e) {
+              var row = e.target.closest('.mp-row');
+              if (!row) return;
+              var open = row.classList.contains('open');
+              mpList.querySelectorAll('.mp-row.open').forEach(function (el) {
+                el.classList.remove('open');
+                var c = el.querySelector('.mp-caret');
+                if (c) c.textContent = '▾';
+              });
+              if (!open) {
+                row.classList.add('open');
+                var caret = row.querySelector('.mp-caret');
+                if (caret) caret.textContent = '▴';
+              }
+            });
+          }
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

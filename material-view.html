@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DD design · 材料色卡</title>
+  <link rel="stylesheet" href="delivery-doc-tokens.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--dd-doc-font);
+      background: var(--dd-doc-bg);
+      color: var(--dd-doc-text-default);
+      font-size: var(--dd-doc-fs-base);
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 16px 14px 48px; }
+    .nav { margin-bottom: 12px; }
+    .nav a { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin-right: 12px; }
+    h1 { font-size: var(--dd-doc-fs-xl); color: var(--dd-doc-text-strong); }
+    .sub { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin: 6px 0 14px; }
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center;
+    }
+    .toolbar input {
+      flex: 1; min-width: 160px; padding: 8px 12px; border: 1px solid var(--dd-doc-border-default);
+      border-radius: 8px; font-size: var(--dd-doc-fs-sm);
+    }
+    .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .tab {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--dd-doc-border-default);
+      background: var(--dd-doc-surface-nested); font-size: 12px; cursor: pointer;
+    }
+    .tab.active { background: #111827; color: #fff; border-color: #111827; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;
+    }
+    .card {
+      background: var(--dd-doc-surface); border-radius: 10px; overflow: hidden;
+      box-shadow: var(--dd-doc-elevation-1); border: 1px solid var(--dd-doc-border-subtle);
+      cursor: pointer;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+      padding: 0;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      width: 100%;
+    }
+    .card:hover {
+      box-shadow: var(--dd-doc-elevation-2, 0 8px 24px rgba(28, 36, 48, 0.12));
+      transform: translateY(-1px);
+    }
+    .card:focus-visible {
+      outline: 2px solid #111827;
+      outline-offset: 2px;
+    }
+    .card img {
+      width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #f3f4f6;
+    }
+    .card .meta { padding: 8px; font-size: 11px; line-height: 1.35; }
+    .code { color: var(--dd-doc-text-muted); font-family: ui-monospace, monospace; }
+    .count { font-size: 12px; color: var(--dd-doc-text-muted); margin-bottom: 8px; }
+    .err { color: #c0392b; }
+    .badge {
+      display: inline-block; padding: 2px 8px; background: #ecfdf5; color: #047857;
+      border-radius: 4px; font-size: 11px; margin-right: 6px;
+    }
+    .lightbox {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0, 0, 0, 0.88);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-inner {
+      position: relative;
+      width: min(96vw, 960px);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .lightbox-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-height: calc(92vh - 72px);
+    }
+    .lightbox img {
+      max-width: 100%;
+      max-height: calc(92vh - 72px);
+      object-fit: contain;
+      border-radius: 10px;
+      display: block;
+      background: #111827;
+    }
+    .lightbox-caption {
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.92);
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 100%;
+    }
+    .lightbox-caption .code {
+      color: rgba(255, 255, 255, 0.65);
+      margin-bottom: 4px;
+    }
+    .lightbox-caption .cat {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .lightbox-close {
+      position: fixed;
+      top: 16px;
+      right: 20px;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .lightbox-close:hover { background: rgba(255, 255, 255, 0.28); }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-nav:hover:not(:disabled) { background: rgba(255, 255, 255, 0.32); }
+    .lightbox-nav:disabled { opacity: 0.25; cursor: default; }
+    .lightbox-prev { left: 8px; }
+    .lightbox-next { right: 8px; }
+    .lightbox-counter {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    @media (min-width: 720px) {
+      .lightbox-prev { left: -56px; }
+      .lightbox-next { right: -56px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <a href="shop.html">选品中心</a>
+      <a href="inquiry-view.html?slug=geya-material-library">项目讨论</a>
+      <a href="admin.html">团队后台</a>
+    </nav>
+    <div id="app" class="sub">加载色卡库…</div>
+  </div>
+  <div class="lightbox" id="imageLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="色卡大图">
+    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="关闭">×</button>
+    <div class="lightbox-inner">
+      <div class="lightbox-stage">
+        <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="上一张">‹</button>
+        <img id="lightboxImg" src="" alt="" />
+        <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="下一张">›</button>
+        <span class="lightbox-counter" id="lightboxCounter" hidden></span>
+      </div>
+      <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var slug = new URLSearchParams(location.search).get('slug') || 'geya-material-library';
+      var app = document.getElementById('app');
+      var lib = null;
+      var activeCat = 'all';
+      var query = '';
+      var lightboxList = [];
+      var lightboxIndex = 0;
+
+      var lb = document.getElementById('imageLightbox');
+      var lbImg = document.getElementById('lightboxImg');
+      var lbCaption = document.getElementById('lightboxCaption');
+      var lbCounter = document.getElementById('lightboxCounter');
+      var lbPrev = document.getElementById('lightboxPrev');
+      var lbNext = document.getElementById('lightboxNext');
+
+      document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+      lb.addEventListener('click', function (e) {
+        if (e.target === lb) closeLightbox();
+      });
+      lbPrev.addEventListener('click', function (e) {
+        e.stopPropagation();
+        stepLightbox(-1);
+      });
+      lbNext.addEventListener('click', function (e) {
+        e.stopPropagation();
+        stepLightbox(1);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!lb.classList.contains('open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowLeft') stepLightbox(-1);
+        else if (e.key === 'ArrowRight') stepLightbox(1);
+      });
+
+      fetch('projects/' + slug + '/material-library.json', { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error('load'); return r.json(); })
+        .then(function (data) { lib = data; return fetch('projects/' + slug + '/project.json', { cache: 'no-store' }); })
+        .then(function (r) { if (r.ok) return r.json(); return null; })
+        .then(function (proj) { if (proj && proj.notion) lib.notion = proj.notion; render(); })
+        .catch(function () {
+          app.innerHTML = '<p class="err">无法加载 material-library.json</p><p class="sub">请从 scheme-center 目录启动静态服务（图片路径 ../材料收集/）</p>';
+        });
+
+      function esc(s) {
+        return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      }
+
+      function filtered() {
+        var list = lib.swatches || [];
+        if (activeCat !== 'all') {
+          list = list.filter(function (s) { return s.category === activeCat; });
+        }
+        if (query.trim()) {
+          var q = query.trim().toLowerCase();
+          list = list.filter(function (s) {
+            return (s.name && s.name.toLowerCase().indexOf(q) >= 0) ||
+              (s.code && s.code.toLowerCase().indexOf(q) >= 0) ||
+              (s.file && s.file.toLowerCase().indexOf(q) >= 0);
+          });
+        }
+        return list;
+      }
+
+      function swatchSrc(sw) {
+        if (sw.imageWeb) return sw.imageWeb;
+        if (sw.image && sw.image.indexOf('assets/') === 0) return sw.image;
+        return sw.image || '';
+      }
+
+      function closeLightbox() {
+        lb.classList.remove('open');
+        lb.setAttribute('aria-hidden', 'true');
+        lbImg.removeAttribute('src');
+        lightboxList = [];
+        lightboxIndex = 0;
+        document.body.style.overflow = '';
+      }
+
+      function updateLightbox() {
+        var sw = lightboxList[lightboxIndex];
+        if (!sw) return;
+        lbImg.src = swatchSrc(sw);
+        lbImg.alt = sw.name || '';
+        lbCaption.innerHTML =
+          (sw.code ? '<div class="code">' + esc(sw.code) + '</div>' : '') +
+          '<div>' + esc(sw.name || '') + '</div>' +
+          (sw.category ? '<div class="cat">' + esc(sw.category) + '</div>' : '');
+        var total = lightboxList.length;
+        if (total > 1) {
+          lbCounter.textContent = (lightboxIndex + 1) + ' / ' + total;
+          lbCounter.hidden = false;
+        } else {
+          lbCounter.hidden = true;
+        }
+        lbPrev.disabled = lightboxIndex <= 0;
+        lbNext.disabled = lightboxIndex >= total - 1;
+      }
+
+      function openLightbox(list, index) {
+        if (!list.length) return;
+        lightboxList = list;
+        lightboxIndex = Math.max(0, Math.min(index, list.length - 1));
+        updateLightbox();
+        lb.classList.add('open');
+        lb.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function stepLightbox(delta) {
+        if (!lightboxList.length) return;
+        lightboxIndex = Math.max(0, Math.min(lightboxList.length - 1, lightboxIndex + delta));
+        updateLightbox();
+      }
+
+      function render() {
+        var s = lib.supplier || {};
+        var brand = s.brand || '格雅衣柜';
+        var contact = s.contact || '';
+        document.title = 'DD design · ' + brand + ' 色卡';
+        var list = filtered();
+        app.innerHTML =
+          '<h1>' + esc(brand) + ' · 材料色卡</h1>' +
+          '<p class="sub"><span class="badge">材料库</span> 对接 ' + esc(contact) +
+          ' · 共 ' + (lib.stats && lib.stats.swatches || 0) + ' 款 · 更新 ' + esc(lib.updatedAt) +
+          (lib.notion && lib.notion.pageUrl ? ' · <a href="' + esc(lib.notion.pageUrl) + '" target="_blank" rel="noopener">Notion</a>' : '') + '</p>' +
+          '<div class="toolbar"><input type="search" id="q" placeholder="搜索色号 / 花色名…" value="' + esc(query) + '" /></div>' +
+          '<div class="tabs" id="tabs"></div>' +
+          '<p class="count">显示 ' + list.length + ' 款</p>' +
+          '<div class="grid" id="grid"></div>';
+
+        var tabs = document.getElementById('tabs');
+        [['all', '全部']].concat((lib.categories || []).map(function (c) { return [c.name, c.name]; })).forEach(function (pair) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'tab' + (activeCat === pair[0] ? ' active' : '');
+          btn.textContent = pair[1];
+          btn.addEventListener('click', function () {
+            activeCat = pair[0];
+            render();
+          });
+          tabs.appendChild(btn);
+        });
+
+        document.getElementById('q').addEventListener('input', function (e) {
+          query = e.target.value;
+          render();
+        });
+
+        var grid = document.getElementById('grid');
+        list.forEach(function (sw, index) {
+          var card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'card';
+          card.setAttribute('aria-label', '查看大图：' + (sw.name || sw.code || '色卡'));
+          card.innerHTML =
+            '<img loading="lazy" alt="' + esc(sw.name) + '" src="' + esc(swatchSrc(sw)) + '" />' +
+            '<div class="meta">' +
+            (sw.code ? '<div class="code">' + esc(sw.code) + '</div>' : '') +
+            '<div>' + esc(sw.name) + '</div></div>';
+          card.addEventListener('click', function () {
+            openLightbox(list, index);
+          });
+          grid.appendChild(card);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "brand": "DD design",
+  "siteUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com",
+  "legacyApp": "shop.html",
+  "apiProvider": "supabase",
+  "supabase": {
+    "url": "https://uysoqjwcmsldrgzdzxlk.supabase.co",
+    "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5c29xandjbXNsZHJnemR6eGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0ODIwMjQsImV4cCI6MjA5OTA1ODAyNH0.XoXq-vUYHT3IrfdJ-ncowJNT53mtwP6DIez8hm9sTHg"
+  },
+  "enableDemoData": false,
+  "allowLocalFallback": false,
+  "magicLinkPath": "p.html",
+  "adminPath": "admin.html",
+  "imageCdnBase": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com"
+}

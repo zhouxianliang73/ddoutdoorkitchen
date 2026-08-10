@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DD design · 材料商选品</title>
+  <link rel="stylesheet" href="delivery-doc-tokens.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--dd-doc-font); background: var(--dd-doc-bg); color: var(--dd-doc-text-default); }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 48px; }
+    h1 { font-size: var(--dd-doc-fs-xl); color: var(--dd-doc-text-strong); }
+    .sub { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin: 8px 0 20px; }
+    .panel { background: var(--dd-doc-surface); border-radius: var(--dd-doc-radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--dd-doc-elevation-1); }
+    .btn { display: inline-block; margin: 6px 8px 0 0; padding: 10px 16px; background: #111827; color: #fff; border-radius: 8px; text-decoration: none; font-size: 14px; }
+    .btn-ghost { background: transparent; color: #111827; border: 1px solid var(--dd-doc-border-default); }
+    .err { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="app" class="sub">加载材料商…</div>
+  </div>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var supplierId = params.get('supplier') || 'geya';
+      var app = document.getElementById('app');
+
+      fetch('suppliers/registry.json', { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (reg) {
+          var base = (reg.siteBase || location.origin).replace(/\/$/, '');
+          var s = (reg.suppliers || []).find(function (x) { return x.id === supplierId; });
+          if (!s) { app.innerHTML = '<p class="err">未找到材料商</p>'; return; }
+          document.title = 'DD design · ' + s.name + ' 选品';
+          var share = s.share || {};
+          app.innerHTML =
+            '<h1>' + esc(s.name) + '</h1>' +
+            '<p class="sub">对接 ' + esc(s.contact || '') + ' · 标准选品卡片 · 可转发给客户选色选款</p>' +
+            '<div class="panel"><h2 style="font-size:15px;margin-bottom:10px">客户选材料</h2>' +
+            '<p class="sub" style="margin-bottom:12px">进入选品中心，筛选「' + esc(s.catalogSpace || s.name) + '」空间</p>' +
+            '<a class="btn" href="' + esc(base + '/' + (share.selectionCenter || 'shop.html?channel=custom&supplier=' + s.id)) + '">进入选品中心</a>' +
+            '<a class="btn btn-ghost" href="' + esc(base + '/' + (share.materialView || '')) + '">浏览色卡库</a></div>' +
+            '<div class="panel"><h2 style="font-size:15px;margin-bottom:10px">团队讨论</h2>' +
+            '<a class="btn btn-ghost" href="' + esc(base + '/' + (share.discussion || '')) + '">项目讨论页</a></div>' +
+            '<div class="panel muted" style="font-size:12px">材料商上传入口：<a href="supplier-upload.html?supplier=' + esc(s.id) + '">supplier-upload.html?supplier=' + esc(s.id) + '</a></div>';
+        })
+        .catch(function () { app.innerHTML = '<p class="err">无法加载 suppliers/registry.json</p>'; });
+
+      function esc(v) {
+        return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      }
+    })();
+  </script>
+</body>
+</html>

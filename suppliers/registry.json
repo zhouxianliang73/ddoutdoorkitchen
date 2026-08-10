@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-10",
+  "siteBase": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com",
+  "suppliers": [
+    {
+      "id": "geya",
+      "name": "格雅衣柜",
+      "contact": "史海霞",
+      "slug": "geya-material-library",
+      "catalogSpace": "格雅衣柜",
+      "channels": ["custom"],
+      "upload": {
+        "accept": "folder:images,excel",
+        "intakePath": "projects/geya-material-library/materials/",
+        "rebuild": "npm run build:geya-materials"
+      },
+      "share": {
+        "portal": "supplier-portal.html?supplier=geya",
+        "selectionCenter": "shop.html?channel=custom&supplier=geya",
+        "materialView": "material-view.html?slug=geya-material-library",
+        "discussion": "inquiry-view.html?slug=geya-material-library"
+      }
+    }
+  ]
+}

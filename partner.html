@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DD design · 合作伙伴</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="delivery-doc-tokens.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--dd-doc-font); background: var(--dd-doc-bg); color: var(--dd-doc-text-default); font-size: var(--dd-doc-fs-base); }
+        .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 48px; }
+        h1 { font-size: var(--dd-doc-fs-xl); color: var(--dd-doc-text-strong); font-weight: var(--dd-doc-fw-bold); }
+        .sub { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin: 8px 0 20px; line-height: 1.5; }
+        .panel { background: var(--dd-doc-surface); border-radius: var(--dd-doc-radius); padding: 20px; box-shadow: var(--dd-doc-elevation-1); margin-bottom: 16px; }
+        label { display: block; font-size: var(--dd-doc-fs-sm); color: var(--dd-doc-text-muted); margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 8px 10px; margin-bottom: 12px; border: 1px solid var(--dd-doc-border-default); border-radius: var(--dd-doc-radius); font: inherit; }
+        .btn { padding: 8px 16px; border: none; border-radius: var(--dd-doc-radius); background: var(--dd-doc-action-bg); color: #fff; font: inherit; cursor: pointer; }
+        .btn-sm { padding: 4px 10px; font-size: var(--dd-doc-fs-xs); }
+        .btn-ghost { background: transparent; color: var(--dd-doc-text-muted); border: 1px solid var(--dd-doc-border-default); }
+        .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .err { color: #c0392b; font-size: var(--dd-doc-fs-sm); margin-top: 8px; }
+        .ok { color: #27ae60; font-size: var(--dd-doc-fs-sm); margin-top: 8px; word-break: break-all; }
+        .nav { margin-bottom: 16px; }
+        .nav a { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin-right: 14px; }
+        .hidden { display: none; }
+        code { font-size: var(--dd-doc-fs-xs); background: var(--dd-doc-surface-nested); padding: 2px 6px; border-radius: 3px; word-break: break-all; }
+        .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+        .chip { font-size: 12px; padding: 4px 8px; background: var(--dd-doc-surface-nested); border-radius: 999px; }
+        .check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .check-row input { width: auto; margin: 0; }
+        ul.links { font-size: 13px; line-height: 1.7; padding-left: 18px; color: var(--dd-doc-text-muted); }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <nav class="nav">
+            <a href="shop.html">选品中心</a>
+            <a href="partner-apply.html">申请入驻</a>
+            <a href="admin.html">团队入口</a>
+        </nav>
+        <h1>合作伙伴工作台</h1>
+        <p class="sub">登录后可浏览全库、勾选外发 SKU、复制给 C 端客户的链接。默认隐藏面价；勾选「显示面价」后客户可见零售价。</p>
+
+        <div id="loginPanel" class="panel">
+            <h2 style="font-size:16px;margin-bottom:12px">登录</h2>
+            <label>邮箱</label>
+            <input id="email" type="email" autocomplete="username" />
+            <label>密码</label>
+            <input id="password" type="password" autocomplete="current-password" />
+            <button class="btn" id="loginBtn" type="button">登录</button>
+            <p id="loginErr" class="err hidden"></p>
+            <p class="sub" style="margin-top:12px">尚未入驻？<a href="partner-apply.html">提交申请</a></p>
+        </div>
+
+        <div id="dashPanel" class="hidden">
+            <div class="panel">
+                <div class="row" style="justify-content:space-between;margin-top:0">
+                    <span id="userLabel"></span>
+                    <button class="btn btn-ghost btn-sm" id="logoutBtn" type="button">退出</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2 style="font-size:16px;margin-bottom:8px">外发选品链接</h2>
+                <label>客户简称 invite</label>
+                <input id="inviteLabel" placeholder="张先生 / 项目简称" />
+                <div class="check-row">
+                    <input type="checkbox" id="showPrice" />
+                    <label for="showPrice" style="margin:0">对客户显示面价（默认关闭，可当面展示）</label>
+                </div>
+                <button class="btn btn-sm" id="copyLinkBtn" type="button">复制 C 端链接</button>
+                <p id="linkPreview" class="ok hidden"></p>
+            </div>
+
+            <div class="panel">
+                <h2 style="font-size:16px;margin-bottom:8px">外发 SKU（catalog id）</h2>
+                <p class="sub" style="margin-bottom:8px">留空且配置了材料空间/supplier 时，按 partners 表规则筛选。建议勾选明确 SKU。</p>
+                <div id="exportChips" class="chip-list"></div>
+                <label>添加 catalog id</label>
+                <input id="catalogIdInput" placeholder="例：f-004 或 geya-xxx" />
+                <div class="row">
+                    <button class="btn btn-sm" id="addIdBtn" type="button">添加</button>
+                    <button class="btn btn-sm btn-ghost" id="saveExportBtn" type="button">保存外发集</button>
+                </div>
+                <p id="exportMsg" class="ok hidden"></p>
+            </div>
+
+            <div class="panel">
+                <h2 style="font-size:16px;margin-bottom:8px">材料上传</h2>
+                <p class="sub">提交色卡 / Excel，团队审批洗数据后进主库。</p>
+                <a id="uploadLink" class="btn btn-ghost btn-sm" href="supplier-upload.html">打开上传页</a>
+            </div>
+
+            <div class="panel">
+                <h2 style="font-size:16px;margin-bottom:8px">说明</h2>
+                <ul class="links">
+                    <li>全库浏览：登录后在 <a href="shop.html" id="fullShopLink">shop.html</a> 选品（团队配置 channel）</li>
+                    <li>C 端只看外发集：<code id="sampleLink"></code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="js/dd-config.js"></script>
+    <script src="js/dd-api-contract.js"></script>
+    <script src="js/providers/api-supabase.js"></script>
+    <script src="js/providers/api-tencent.js"></script>
+    <script src="js/dd-api.js"></script>
+    <script>
+        (async function () {
+            const config = await DDConfig.loadConfig();
+            const SESSION_KEY = 'dd_partner_session';
+            let session = loadSession();
+            let profile = null;
+            let exportIds = [];
+
+            const loginPanel = document.getElementById('loginPanel');
+            const dashPanel = document.getElementById('dashPanel');
+            const loginErr = document.getElementById('loginErr');
+
+            if (tokenOf(session)) bootstrap();
+            else showLogin();
+
+            document.getElementById('loginBtn').addEventListener('click', async () => {
+                loginErr.classList.add('hidden');
+                try {
+                    session = await DDApi.auth.loginWithPassword(config,
+                        document.getElementById('email').value.trim(),
+                        document.getElementById('password').value);
+                    profile = await DDApi.partner.fetchCurrentPartner(config, session);
+                    saveSession(session);
+                    await bootstrap();
+                } catch (e) {
+                    loginErr.textContent = e.message === 'not_partner'
+                        ? '该账号未绑定合作伙伴，请等待 admin 审批。'
+                        : (e.message || '登录失败');
+                    loginErr.classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                session = null;
+                profile = null;
+                localStorage.removeItem(SESSION_KEY);
+                showLogin();
+            });
+
+            document.getElementById('addIdBtn').addEventListener('click', () => {
+                const id = document.getElementById('catalogIdInput').value.trim();
+                if (!id || exportIds.includes(id)) return;
+                exportIds.push(id);
+                document.getElementById('catalogIdInput').value = '';
+                renderChips();
+            });
+
+            document.getElementById('saveExportBtn').addEventListener('click', async () => {
+                const msg = document.getElementById('exportMsg');
+                msg.classList.add('hidden');
+                try {
+                    await DDApi.partner.setExportItems(config, session, profile.id, exportIds);
+                    profile.exportCatalogIds = exportIds.slice();
+                    msg.textContent = '已保存外发 SKU';
+                    msg.classList.remove('hidden');
+                    updateLinkPreview();
+                } catch (e) {
+                    msg.textContent = e.message || '保存失败';
+                    msg.className = 'err';
+                    msg.classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('copyLinkBtn').addEventListener('click', () => {
+                const link = buildLink();
+                navigator.clipboard?.writeText(link);
+                const el = document.getElementById('linkPreview');
+                el.innerHTML = '已复制：<code>' + esc(link) + '</code>';
+                el.classList.remove('hidden');
+            });
+
+            document.getElementById('showPrice').addEventListener('change', updateLinkPreview);
+            document.getElementById('inviteLabel').addEventListener('input', updateLinkPreview);
+
+            async function bootstrap() {
+                try {
+                    if (!profile) profile = await DDApi.partner.fetchMyProfile(config, session);
+                } catch (e) {
+                    showLogin();
+                    loginErr.textContent = e.message || '会话失效';
+                    loginErr.classList.remove('hidden');
+                    return;
+                }
+                exportIds = (profile.exportCatalogIds || []).slice();
+                showDash();
+                renderChips();
+                updateLinkPreview();
+                document.getElementById('uploadLink').href = 'supplier-upload.html?supplier=' + encodeURIComponent(profile.id);
+                document.getElementById('sampleLink').textContent = buildLink();
+            }
+
+            function buildLink() {
+                return DDApi.buildPartnerShopLink(config, {
+                    partnerId: profile.id,
+                    channel: profile.defaultChannel,
+                    invite: document.getElementById('inviteLabel').value.trim(),
+                    showPrice: document.getElementById('showPrice').checked,
+                });
+            }
+
+            function updateLinkPreview() {
+                document.getElementById('sampleLink').textContent = buildLink();
+            }
+
+            function renderChips() {
+                const wrap = document.getElementById('exportChips');
+                wrap.innerHTML = exportIds.map(id =>
+                    `<span class="chip">${esc(id)} <button type="button" data-rm="${esc(id)}" style="border:none;background:none;cursor:pointer">×</button></span>`
+                ).join('');
+                wrap.querySelectorAll('[data-rm]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        exportIds = exportIds.filter(x => x !== btn.dataset.rm);
+                        renderChips();
+                    });
+                });
+            }
+
+            function showLogin() {
+                loginPanel.classList.remove('hidden');
+                dashPanel.classList.add('hidden');
+            }
+
+            function showDash() {
+                loginPanel.classList.add('hidden');
+                dashPanel.classList.remove('hidden');
+                const typeLabel = profile.partnerType === 'material' ? '材料商' : '经销商';
+                document.getElementById('userLabel').textContent =
+                    (profile.name || profile.companyName) + ' · ' + typeLabel + ' · ' + (session.user?.email || '');
+            }
+
+            function tokenOf(s) { return s && (s.accessToken || s.access_token); }
+            function loadSession() {
+                try {
+                    const raw = JSON.parse(localStorage.getItem(SESSION_KEY));
+                    if (!raw) return null;
+                    return raw.accessToken ? raw : DDApi.auth.normalizeSession(raw, 'supabase');
+                } catch { return null; }
+            }
+            function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+            function esc(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+        })();
+    </script>
+</body>
+</html>

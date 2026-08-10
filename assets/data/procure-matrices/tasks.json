@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "title": "采购工具",
+  "subtitle": "在询任务 · 决策表（参数×厂家 / 厂家×参数可切换）",
+  "tasks": [
+    {
+      "id": "proc-wine-cabinet",
+      "title": "定制酒柜",
+      "blurb": "2800×3000×600 · 常温预留 vs 整机/恒温一体 · 四家比价",
+      "statusLabel": "询价中",
+      "matrixKey": "wine-cabinet",
+      "sourceFile": "酒柜报价-2026-08-07",
+      "builtin": true,
+      "always": true
+    },
+    {
+      "id": "proc-pergola",
+      "title": "电动翻转百叶凉亭",
+      "blurb": "6×4×2.5 · 主体(含百叶)/遮阳分列 · 柱数单独对比",
+      "statusLabel": "询价中",
+      "matrixKey": "pergola",
+      "sourceFile": "凉亭产品对比表-6x4.xlsx",
+      "builtin": true,
+      "always": true
+    },
+    {
+      "id": "proc-awning",
+      "title": "伸缩遮阳棚",
+      "blurb": "宽×伸出横比 · 全盒曲臂决策",
+      "statusLabel": "询价中",
+      "matrixKey": "awning",
+      "sourceFile": "户外凉亭遮阳伞.xlsx",
+      "builtin": true,
+      "always": false,
+      "demo": true
+    }
+  ]
+}

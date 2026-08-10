@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DD design · 精选案例</title>
+    <meta name="description" content="DD design 精选过往案例 — 公开展示" />
+    <meta property="og:site_name" content="DD design" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DD design · 精选案例" />
+    <meta property="og:description" content="DD design 精选过往案例 — 公开展示" />
+    <meta property="og:url" content="https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/showcase.html" />
+    <meta property="og:image" content="https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/cases/christophe/assets/u8-ultra-3200.jpg" />
+    <meta property="og:image:width" content="1400" />
+    <meta property="og:image:height" content="781" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="delivery-doc-tokens.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--dd-doc-font);
+            background: var(--dd-doc-bg);
+            color: var(--dd-doc-text-default);
+            font-size: var(--dd-doc-fs-base);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+        header { margin-bottom: 28px; }
+        header h1 { font-size: var(--dd-doc-fs-xl); color: var(--dd-doc-text-strong); font-weight: var(--dd-doc-fw-bold); }
+        header p { color: var(--dd-doc-text-muted); margin-top: 6px; font-size: var(--dd-doc-fs-md); }
+        .nav { margin-top: 12px; display: flex; gap: 16px; flex-wrap: wrap; }
+        .nav a { color: var(--dd-doc-text-strong); text-decoration: none; font-size: var(--dd-doc-fs-sm); }
+        .nav a:hover { text-decoration: underline; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .card {
+            background: var(--dd-doc-surface);
+            border-radius: var(--dd-doc-radius);
+            overflow: hidden;
+            box-shadow: var(--dd-doc-elevation-1);
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: var(--dd-doc-elevation-hover); }
+        /* 对齐小程序 widthFix：完整显示封面，不裁切 */
+        .card img { width: 100%; height: auto; object-fit: contain; display: block; background: var(--dd-doc-surface-inset); vertical-align: top; }
+        .card-bd { padding: 14px 16px 16px; }
+        .card-tag { font-size: var(--dd-doc-fs-xs); color: var(--dd-doc-text-light); margin-bottom: 4px; }
+        .card h2 { font-size: var(--dd-doc-fs-lg); color: var(--dd-doc-text-strong); font-weight: var(--dd-doc-fw-bold); margin-bottom: 6px; }
+        .card p { color: var(--dd-doc-text-muted); font-size: var(--dd-doc-fs-sm); margin-bottom: 10px; }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .tag { font-size: var(--dd-doc-fs-xs); padding: 2px 8px; background: var(--dd-doc-surface-nested); border-radius: 4px; color: var(--dd-doc-text-muted); }
+        .card-actions { display: flex; gap: 10px; }
+        .btn {
+            display: inline-block; padding: 6px 12px; font-size: var(--dd-doc-fs-sm);
+            border-radius: var(--dd-doc-radius); text-decoration: none; border: none; cursor: pointer;
+        }
+        .btn-primary { background: var(--dd-doc-action-bg); color: #fff; }
+        .btn-primary:hover { background: var(--dd-doc-action-hover); }
+        .btn-ghost { background: transparent; color: var(--dd-doc-text-muted); border: 1px solid var(--dd-doc-border-default); }
+        .state { text-align: center; padding: 48px 16px; color: var(--dd-doc-text-muted); }
+        .err { color: #c0392b; }
+        .card { cursor: pointer; }
+        .card:focus-visible { outline: 2px solid var(--dd-doc-text-strong); outline-offset: 2px; }
+        .lightbox {
+            position: fixed; inset: 0; z-index: 1000; display: none;
+            align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.88); padding: 16px;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .lightbox-close {
+            position: absolute; top: 12px; right: 12px; width: 40px; height: 40px;
+            border: none; border-radius: 50%; background: rgba(255,255,255,0.15);
+            color: #fff; font-size: 24px; cursor: pointer; line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <h1>DD design · 精选案例</h1>
+            <p>公开展示 · 真实项目请通过销售提供的专属链接访问</p>
+            <nav class="nav">
+                <a href="shop.html">进入选品中心</a>
+                <a href="admin.html">团队登录</a>
+            </nav>
+        </header>
+        <div id="root" class="state">加载案例…</div>
+    </div>
+    <div class="lightbox" id="caseLightbox" aria-hidden="true">
+        <button type="button" class="lightbox-close" id="caseLightboxClose" aria-label="关闭">×</button>
+        <img id="caseLightboxImg" src="" alt="" />
+    </div>
+    <script src="js/dd-config.js"></script>
+    <script>
+        (async function () {
+            const root = document.getElementById('root');
+            const lb = document.getElementById('caseLightbox');
+            const lbImg = document.getElementById('caseLightboxImg');
+            function openDetail(url, alt) {
+                if (!url || !lb || !lbImg) return;
+                lbImg.src = url;
+                lbImg.alt = alt || '';
+                lb.classList.add('open');
+                lb.setAttribute('aria-hidden', 'false');
+            }
+            function closeDetail() {
+                if (!lb) return;
+                lb.classList.remove('open');
+                lb.setAttribute('aria-hidden', 'true');
+                if (lbImg) lbImg.src = '';
+            }
+            document.getElementById('caseLightboxClose')?.addEventListener('click', closeDetail);
+            lb?.addEventListener('click', function (e) {
+                if (e.target === lb) closeDetail();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeDetail();
+            });
+            try {
+                if (window.DDConfig) await DDConfig.loadConfig();
+                const res = await fetch('showcase.json', { cache: 'no-store' });
+                if (!res.ok) throw new Error('无法加载 showcase.json');
+                const data = await res.json();
+                document.title = `${data.brand || 'DD design'} · 精选案例`;
+                if (!data.cases?.length) {
+                    root.textContent = '暂无案例';
+                    return;
+                }
+                const sorted = [...data.cases].sort((a, b) => (a.order || 0) - (b.order || 0));
+                const cdn = (window.DDConfig && DDConfig.getConfigSync().imageCdnBase || '').replace(/\/$/, '');
+                function cdnify(url) {
+                    if (!url) return '';
+                    if (String(url).indexOf('http') === 0) return url;
+                    if (String(url).indexOf('/cases/') === 0 || String(url).indexOf('cases/') === 0) {
+                        return String(url).indexOf('/') === 0 ? url : '/' + url;
+                    }
+                    if (cdn && String(url).indexOf('/images/') === 0) {
+                        return cdn + '/' + String(url).replace(/^\/images\//, '');
+                    }
+                    return url;
+                }
+                root.className = 'grid';
+                root.innerHTML = sorted.map(c => {
+                    const detail = cdnify(c.detail || c.cover);
+                    const openHref = c.h5Url || '';
+                    const openLabel = c.h5Url ? '打开案例 H5' : '查看大图';
+                    return `
+                    <article class="card" data-h5-url="${(c.h5Url || '').replace(/"/g, '')}" data-detail-url="${(detail || '').replace(/"/g, '')}" data-title="${(c.title || '').replace(/"/g, '&quot;')}">
+                        <img src="${cdnify(c.cover)}" alt="${c.title}" loading="lazy" referrerpolicy="no-referrer" />
+                        <div class="card-bd">
+                            <div class="card-tag">${c.projectType || ''} · ${c.status || ''}${c.h5Url ? ' · H5' : ''}</div>
+                            <h2>${c.title}</h2>
+                            <p>${c.summary || ''}</p>
+                            <div class="tags">${(c.highlights || []).map(h => `<span class="tag">${h}</span>`).join('')}</div>
+                            <div class="card-actions">
+                                <a class="btn btn-primary" href="${openHref || '#'}" data-open-case>${openLabel}</a>
+                                <a class="btn btn-ghost" href="shop.html?channel=${encodeURIComponent(c.channel || 'custom')}">同渠道选品</a>
+                            </div>
+                        </div>
+                    </article>`;
+                }).join('');
+                root.addEventListener('click', function (e) {
+                    const ghost = e.target.closest('.btn-ghost');
+                    if (ghost) return;
+                    const card = e.target.closest('.card');
+                    if (!card) return;
+                    const openBtn = e.target.closest('[data-open-case]');
+                    if (openBtn) e.preventDefault();
+                    const h5 = card.getAttribute('data-h5-url');
+                    if (h5) {
+                        location.href = h5;
+                        return;
+                    }
+                    const detail = card.getAttribute('data-detail-url');
+                    if (detail) {
+                        openDetail(detail, card.getAttribute('data-title') || '');
+                    }
+                });
+            } catch (err) {
+                root.innerHTML = `<p class="err">${err.message}</p>`;
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+{
+  "version": 5,
+  "brand": "DD design",
+  "updatedAt": "2026-08-07T07:20:00+08:00",
+  "baseUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com",
+  "cases": [
+    {
+      "id": "case-outdoor-pergola",
+      "title": "户外客厅 · 凉亭与户外厨房",
+      "titleEn": "Outdoor Living · Pergola & Kitchen",
+      "channel": "outdoor-living",
+      "projectType": "户外全案",
+      "status": "深化完成",
+      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-outdoor-pergola.jpg",
+      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-outdoor-pergola.png",
+      "summary": "百叶凉亭 + 户外厨房岛台深化落图，含格栅屏风与平台尺寸，可与户外选品清单联动。",
+      "highlights": [
+        "凉亭深化",
+        "户外厨房",
+        "格栅构件"
+      ],
+      "featuredProducts": [],
+      "order": 0
+    },
+    {
+      "id": "case-cloud-ok-main",
+      "title": "Outdoor Kitchen",
+      "titleEn": "Outdoor Kitchen Containers",
+      "channel": "outdoor-kitchen",
+      "projectType": "户外厨房",
+      "status": "深化完成",
+      "cover": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/cases/christophe/assets/u8-ultra-3200.jpg",
+      "detail": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/cases/christophe/assets/u8-ultra-3200.jpg",
+      "h5Url": "https://zhouxianliang73.github.io/dd-ok-share/ok.html",
+      "linkMode": "h5",
+      "summary": "Mobile outdoor kitchen - MINI / PRO / ULTRA. Filter by door and size inside.",
+      "highlights": [
+        "MINI",
+        "PRO",
+        "ULTRA",
+        "H5"
+      ],
+      "featuredProducts": [],
+      "order": 1,
+      "updatedHint": "ultra-3200"
+    },
+    {
+      "id": "case-circular-bookshelf",
+      "title": "圆形阅读舱 · 整墙书柜",
+      "titleEn": "Circular Reading Nook Bookshelf",
+      "channel": "custom",
+      "projectType": "全屋定制",
+      "status": "深化完成",
+      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-circular-bookshelf.jpg",
+      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-circular-bookshelf.png",
+      "summary": "整墙书柜 3345×2415，中部 φ2000 阅读舱与不规则格子深化，舱深与柜深分层标注。",
+      "highlights": [
+        "阅读舱",
+        "格子深化",
+        "尺寸落图"
+      ],
+      "featuredProducts": [],
+      "order": 10
+    },
+    {
+      "id": "case-entry-modular",
+      "title": "玄关模块 · 换鞋与展示",
+      "titleEn": "Entry Modular Cabinetry",
+      "channel": "custom",
+      "projectType": "全屋定制",
+      "status": "深化完成",
+      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-entry-modular.jpg",
+      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-entry-modular.png",
+      "summary": "玄关鞋柜 + 展示柜拆为墙装模块，整体统一又便于拆装组合，兼顾颜值与搬运。",
+      "highlights": [
+        "模块拆分",
+        "墙装",
+        "组合灵活"
+      ],
+      "featuredProducts": [],
+      "order": 11
+    },
+    {
+      "id": "case-wine-cabinet",
+      "title": "酒窖酒柜 · 恒温存储",
+      "titleEn": "Wine Cabinet Deepening",
+      "channel": "custom",
+      "projectType": "定制家具",
+      "status": "深化完成",
+      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-wine-cabinet.jpg",
+      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-wine-cabinet.png",
+      "summary": "嵌入式双门酒柜与专业酒柜参数深化：藏灯、藤编背板、金属木拼接与等离子净味。",
+      "highlights": [
+        "恒温酒柜",
+        "细节工艺",
+        "净味系统"
+      ],
+      "featuredProducts": [],
+      "order": 12
+    },
+    {
+      "id": "case-tv-wall",
+      "title": "电视背景墙 · 柜体深化",
+      "titleEn": "TV Wall Cabinet",
+      "channel": "custom",
+      "projectType": "全屋定制",
+      "status": "深化完成",
+      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-tv-wall.jpg",
+      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-tv-wall.png",
+      "summary": "电视墙柜 3000×2400，多层实木免漆板、45°内斜切拉手，强弱电与设备隐藏收纳。",
+      "highlights": [
+        "电视墙",
+        "隐藏拉手",
+        "强弱电"
+      ],
+      "featuredProducts": [],
+      "order": 13
+    }
+  ],
+  "cacheBust": 1786058788452
+}
