@@ -7,7 +7,7 @@
     "subtitle": "选品 · 方案 · 跟踪"
   },
   "defaultChannel": "custom",
-  "salesLinkBase": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/shop.html",
+  "salesLinkBase": "https://ddoutdoorkitchen.com/",
   "platform": {
     "siteUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com",
     "showcase": "showcase.html",
@@ -38,7 +38,7 @@
       "independentDomain": true,
       "site": "outdoor-kitchen",
       "siteUrl": "https://zhouxianliang73.github.io/outdoor-kitchen/",
-      "collabUrl": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/shop.html?channel=outdoor-kitchen",
+      "collabUrl": "https://ddoutdoorkitchen.com/?channel=outdoor-kitchen",
       "quoteTemplate": "outdoor-kitchen",
       "catalogSpaces": [
         "户外厨房",
