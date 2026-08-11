@@ -38,6 +38,38 @@ button, input { font: inherit; }
   padding-bottom: calc(24px + var(--safe-b));
 }
 
+/* 大屏加宽：从选品中心点入时不再突然缩成手机条；手机仍保持 480 */
+@media (min-width: 768px) {
+  body { background: #e4e4e4; }
+  .page {
+    max-width: 820px;
+    margin: 16px auto 32px;
+    background: var(--bg);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    min-height: calc(100vh - 48px);
+  }
+  .topbar { border-radius: 12px 12px 0 0; }
+  .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 10px 16px 0;
+  }
+  .intros {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 12px 16px 0;
+  }
+  .meta-line,
+  .page-lead,
+  .contact-card { margin-left: 16px; margin-right: 16px; }
+}
+@media (min-width: 1100px) {
+  .page { max-width: 960px; }
+}
+
 /* sticky bar */
 .topbar {
   position: sticky;
