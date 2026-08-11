@@ -11,8 +11,8 @@
       "channel": "outdoor-living",
       "projectType": "户外全案",
       "status": "深化完成",
-      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-outdoor-pergola.jpg",
-      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-outdoor-pergola.png",
+      "cover": "/images/cases/case-outdoor-pergola.jpg",
+      "detail": "/images/cases/full/case-outdoor-pergola.png",
       "summary": "百叶凉亭 + 户外厨房岛台深化落图，含格栅屏风与平台尺寸，可与户外选品清单联动。",
       "highlights": [
         "凉亭深化",
@@ -31,7 +31,7 @@
       "status": "深化完成",
       "cover": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/cases/christophe/assets/u8-ultra-3200.jpg",
       "detail": "https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/cases/christophe/assets/u8-ultra-3200.jpg",
-      "h5Url": "https://zhouxianliang73.github.io/dd-ok-share/ok.html",
+      "h5Url": "https://ddoutdoorkitchen.com/kitchen/",
       "linkMode": "h5",
       "summary": "Mobile outdoor kitchen - MINI / PRO / ULTRA. Filter by door and size inside.",
       "highlights": [
@@ -51,8 +51,8 @@
       "channel": "custom",
       "projectType": "全屋定制",
       "status": "深化完成",
-      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-circular-bookshelf.jpg",
-      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-circular-bookshelf.png",
+      "cover": "/images/cases/case-circular-bookshelf.jpg",
+      "detail": "/images/cases/full/case-circular-bookshelf.png",
       "summary": "整墙书柜 3345×2415，中部 φ2000 阅读舱与不规则格子深化，舱深与柜深分层标注。",
       "highlights": [
         "阅读舱",
@@ -69,8 +69,8 @@
       "channel": "custom",
       "projectType": "全屋定制",
       "status": "深化完成",
-      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-entry-modular.jpg",
-      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-entry-modular.png",
+      "cover": "/images/cases/case-entry-modular.jpg",
+      "detail": "/images/cases/full/case-entry-modular.png",
       "summary": "玄关鞋柜 + 展示柜拆为墙装模块，整体统一又便于拆装组合，兼顾颜值与搬运。",
       "highlights": [
         "模块拆分",
@@ -87,8 +87,8 @@
       "channel": "custom",
       "projectType": "定制家具",
       "status": "深化完成",
-      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-wine-cabinet.jpg",
-      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-wine-cabinet.png",
+      "cover": "/images/cases/case-wine-cabinet.jpg",
+      "detail": "/images/cases/full/case-wine-cabinet.png",
       "summary": "嵌入式双门酒柜与专业酒柜参数深化：藏灯、藤编背板、金属木拼接与等离子净味。",
       "highlights": [
         "恒温酒柜",
@@ -105,8 +105,8 @@
       "channel": "custom",
       "projectType": "全屋定制",
       "status": "深化完成",
-      "cover": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/case-tv-wall.jpg",
-      "detail": "https://scheme-center-images-1301307199.cos.ap-guangzhou.myqcloud.com/cases/full/case-tv-wall.png",
+      "cover": "/images/cases/case-tv-wall.jpg",
+      "detail": "/images/cases/full/case-tv-wall.png",
       "summary": "电视墙柜 3000×2400，多层实木免漆板、45°内斜切拉手，强弱电与设备隐藏收纳。",
       "highlights": [
         "电视墙",

@@ -70,13 +70,13 @@
   }
 
   function shareUrl() {
-    // WhatsApp/Meta 爬虫访问不到腾讯云；分享页用 GitHub Pages 才能出封面卡片
-    var base = "https://zhouxianliang73.github.io/dd-ok-share/ok.html";
+    // 站内转发统一短链；域名在 GitHub Pages，WhatsApp/Meta 可抓 OG 封面
+    var base = "https://ddoutdoorkitchen.com/kitchen/";
     var parts = [];
     if (state.door && state.door !== "all") parts.push("door=" + encodeURIComponent(state.door));
     if (state.size && state.size !== "all") parts.push("size=" + encodeURIComponent(String(state.size)));
     if (state.lang) parts.push("lang=" + encodeURIComponent(state.lang));
-    return parts.length ? base + "?v=card3#" + parts.join("&") : base + "?v=card3";
+    return parts.length ? base + "?" + parts.join("&") : base;
   }
 
   function shareMessage() {
