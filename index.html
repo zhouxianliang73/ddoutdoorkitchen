@@ -6513,9 +6513,16 @@
                     <span class="badge badge-gold"><i class="fas fa-crown"></i> 会员</span>
                 </div>
                 <div class="projects-page-hd-actions">
-                    <button class="btn btn-primary btn-sm" id="newProjectBtn">
+                    <button class="btn btn-primary btn-sm" id="newProjectBtn" type="button">
                         <i class="fas fa-plus"></i> 新建方案
                     </button>
+                    <button class="btn btn-ghost btn-sm" id="exportProjectsBtn" type="button" title="导出本机方案包，可用微信发给同事">
+                        <i class="fas fa-share-square"></i> 传出
+                    </button>
+                    <button class="btn btn-ghost btn-sm" id="importProjectsBtn" type="button" title="接收微信发来的方案包">
+                        <i class="fas fa-file-import"></i> 接收
+                    </button>
+                    <input type="file" id="importProjectsFile" accept="application/json,.json" hidden />
                     <div class="view-toggle-wrap">
                         <button type="button" class="view-toggle-btn" id="viewToggleBtn" data-view="list" title="切换为图例" aria-label="当前列表视图，点击切换图例">
                             <i class="fas fa-list" aria-hidden="true"></i>
@@ -6528,7 +6535,7 @@
             <div id="view-list" class="view-panel active">
                 <div class="project-list-toolbar">
                     <label><input type="checkbox" id="selectAll" /> 全选方案</label>
-                    <span class="text-muted" style="color:var(--text-tertiary);font-size:12px;">设计中 / 待确认 · PC 悬停展开 · 手机点击表头</span>
+                    <span class="text-muted" style="color:var(--text-tertiary);font-size:12px;">本机方案 · 不上传 · 可用「传出/接收」微信传文件</span>
                 </div>
                 <div id="projectListRoot" class="project-list"></div>
 
@@ -8449,7 +8456,169 @@
         let activeProjectId = '';
         let mergeSuggestedName = '';
 
-        const projectsData = [];
+        const LOCAL_PROJECTS_KEY = 'dd_local_projects_v1';
+        let projectsData = [];
+
+        function persistLocalProjects() {
+            try {
+                const payload = {
+                    version: 1,
+                    updatedAt: new Date().toISOString(),
+                    projects: projectsData,
+                };
+                localStorage.setItem(LOCAL_PROJECTS_KEY, JSON.stringify(payload));
+            } catch (err) {
+                console.warn('[projects] persist failed', err);
+                showToast('本机存储已满', '请删减方案或导出后清理图片后再试');
+            }
+        }
+
+        function loadLocalProjects() {
+            try {
+                const raw = localStorage.getItem(LOCAL_PROJECTS_KEY);
+                if (!raw) return [];
+                const data = JSON.parse(raw);
+                return Array.isArray(data?.projects) ? data.projects : (Array.isArray(data) ? data : []);
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function createEmptyLocalProject(name, projectType) {
+            const today = new Date().toISOString().slice(0, 10);
+            return {
+                id: `p-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                name: name || `未命名方案 ${today}`,
+                designer: '',
+                status: '设计中',
+                statusClass: 'badge-info',
+                price: 0,
+                address: '',
+                projectType: projectType || '定制方案',
+                eta: '',
+                updatedFull: today,
+                checked: false,
+                localOnly: true,
+                products: [],
+                quoteCategories: [],
+                production: [],
+                shipping: [],
+                comm: {
+                    clientImages: [],
+                    clientFeedbackImages: [],
+                    designerImages: [],
+                },
+            };
+        }
+
+        function openNewProjectDialog() {
+            const name = window.prompt('新建本机方案（仅保存在本设备，不上传）\n请输入方案名称：', `新方案 ${new Date().toISOString().slice(0, 10)}`);
+            if (name == null) return;
+            const trimmed = String(name).trim();
+            if (!trimmed) {
+                showToast('未创建', '名称不能为空');
+                return;
+            }
+            const project = createEmptyLocalProject(trimmed);
+            projectsData.unshift(project);
+            projectsData.forEach(p => { if (!p.parentId) p.checked = p.id === project.id; });
+            activeProjectId = project.id;
+            persistLocalProjects();
+            renderProjects();
+            updateSelection();
+            updateMergeHint();
+            showToast('已新建本机方案', '可用「传出」生成文件，微信发给同事；对方点「接收」导入');
+            switchPage('page-projects');
+            requestAnimationFrame(() => {
+                document.querySelector(`.project-shell[data-project-id="${project.id}"]`)?.classList.add('is-open');
+            });
+        }
+
+        function buildProjectPack(list) {
+            return {
+                format: 'dd-scheme-project-pack',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                projects: JSON.parse(JSON.stringify(list || [])),
+            };
+        }
+
+        async function exportLocalProjectsPack() {
+            const selectedIds = getSelectedProjectIds();
+            let list = selectedIds.length
+                ? projectsData.filter(p => selectedIds.includes(p.id))
+                : getTopLevelProjects();
+            if (!list.length) {
+                showToast('没有可传出的方案', '请先新建或勾选方案');
+                return;
+            }
+            const pack = buildProjectPack(list);
+            const blob = new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' });
+            const filename = `dd-projects-${new Date().toISOString().slice(0, 10)}.json`;
+            const file = new File([blob], filename, { type: 'application/json' });
+
+            if (navigator.share && navigator.canShare?.({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'DD 方案包',
+                        text: `共 ${list.length} 个本机方案，可在对方手机「项目 → 接收」导入`,
+                    });
+                    showToast('已调起分享', '请选择微信发送给同事');
+                    return;
+                } catch (err) {
+                    if (err && err.name === 'AbortError') return;
+                }
+            }
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+            showToast('方案包已下载', '用微信把该 JSON 文件发给对方，对方点「接收」导入');
+        }
+
+        function importLocalProjectsPack(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const data = JSON.parse(String(reader.result || ''));
+                    const incoming = Array.isArray(data?.projects) ? data.projects
+                        : (data?.format === 'dd-scheme-project-pack' && Array.isArray(data.projects) ? data.projects : null);
+                    if (!incoming?.length) {
+                        showToast('无法识别', '请选择 DD 方案包 JSON 文件');
+                        return;
+                    }
+                    let added = 0;
+                    incoming.forEach(raw => {
+                        if (!raw || typeof raw !== 'object') return;
+                        const copy = JSON.parse(JSON.stringify(raw));
+                        const exists = projectsData.some(p => p.id === copy.id);
+                        if (exists) copy.id = `p-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+                        copy.localOnly = true;
+                        copy.checked = false;
+                        delete copy.parentId;
+                        projectsData.unshift(copy);
+                        added += 1;
+                    });
+                    persistLocalProjects();
+                    enrichAllProjectsData();
+                    renderProjects();
+                    updateSelection();
+                    showToast('已接收方案', `成功导入 ${added} 个本机方案`);
+                    switchPage('page-projects');
+                } catch (err) {
+                    console.warn(err);
+                    showToast('导入失败', '文件不是有效的方案包');
+                }
+            };
+            reader.readAsText(file);
+        }
 
         function enrichProjectProductImages(p) {
             if (!p) return;
@@ -10130,18 +10299,25 @@
 
         function processMediaUploadFile(file, ctx) {
             if (!file || !ctx) return;
-            const url = URL.createObjectURL(file);
-            const ok = addMediaImage(ctx.projectId, ctx.mediaKey, {
-                url,
-                alt: file.name.replace(/\.[^.]+$/, ''),
-                date: formatNowStripDate(),
-                note: ctx.categoryLabel || '',
-            }, ctx.categoryId || null);
-            if (!ok) return;
-            refreshProjectShell(ctx.projectId);
-            const sectionName = ctx.sectionLabel || MEDIA_SECTION_KEYS[ctx.mediaKey]?.label || '版块';
-            const catPart = ctx.categoryLabel ? ` · ${ctx.categoryLabel}` : '';
-            showToast('✅ 图片已添加', `已加入「${sectionName}${catPart}」`);
+            const reader = new FileReader();
+            reader.onload = () => {
+                const url = String(reader.result || '');
+                if (!url) return;
+                const ok = addMediaImage(ctx.projectId, ctx.mediaKey, {
+                    url,
+                    alt: file.name.replace(/\.[^.]+$/, ''),
+                    date: formatNowStripDate(),
+                    note: ctx.categoryLabel || '',
+                }, ctx.categoryId || null);
+                if (!ok) return;
+                persistLocalProjects();
+                refreshProjectShell(ctx.projectId);
+                const sectionName = ctx.sectionLabel || MEDIA_SECTION_KEYS[ctx.mediaKey]?.label || '版块';
+                const catPart = ctx.categoryLabel ? ` · ${ctx.categoryLabel}` : '';
+                showToast('✅ 图片已添加', `已加入「${sectionName}${catPart}」（本机保存）`);
+            };
+            reader.onerror = () => showToast('读取失败', '无法读取该图片');
+            reader.readAsDataURL(file);
         }
 
         function initMediaImageUpload() {
@@ -10310,6 +10486,7 @@
                 return copy;
             });
             projectsData.splice(mergedIdx, 1, ...restored);
+            persistLocalProjects();
             activeProjectId = restored[0]?.id || '';
             renderProjects();
             updateSelection();
@@ -10375,6 +10552,7 @@
             });
             projectsData.unshift(mergedProject);
             projectsData.forEach(p => { if (!p.parentId) p.checked = p.id === mergedProject.id; });
+            persistLocalProjects();
 
             const nameInput = document.getElementById('mergeNameInput');
             if (nameInput) {
@@ -10403,6 +10581,7 @@
                 const idx = projectsData.findIndex(p => p.id === id);
                 if (idx !== -1) projectsData.splice(idx, 1);
             });
+            persistLocalProjects();
             activeProjectId = getTopLevelProjects()[0]?.id || '';
             renderProjects();
             updateSelection();
@@ -10684,6 +10863,10 @@
         }
 
         function initProjects() {
+            const loaded = loadLocalProjects();
+            if (loaded.length) {
+                projectsData = loaded;
+            }
             projectsData.forEach(p => {
                 (p.products || []).forEach(prod => ensureProductBaseline(prod));
                 (p.quoteCategories || []).forEach(cat => (cat.products || []).forEach(prod => ensureProductBaseline(prod)));
@@ -10872,7 +11055,17 @@
             }
 
             if (target.closest('#newProjectBtn')) {
-                showToast('✨ 新建方案', '正在创建新方案，请填写基本信息');
+                openNewProjectDialog();
+                return;
+            }
+
+            if (target.closest('#exportProjectsBtn')) {
+                exportLocalProjectsPack();
+                return;
+            }
+
+            if (target.closest('#importProjectsBtn')) {
+                document.getElementById('importProjectsFile')?.click();
                 return;
             }
 
@@ -10970,6 +11163,11 @@
             initHomeInteractions();
             initToolsInteractions();
             initMediaImageUpload();
+            document.getElementById('importProjectsFile')?.addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                e.target.value = '';
+                importLocalProjectsPack(file);
+            });
             initCommChannels();
             initMergeProjects();
             document.getElementById('shopPickerBack')?.addEventListener('click', () => closeShopPicker(true));
