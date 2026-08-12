@@ -6635,7 +6635,7 @@
             <div class="card" style="padding:14px 14px 4px;">
                 <div class="card-header" style="margin-bottom:12px;">
                     <span><i class="fas fa-tasks" style="color:var(--primary);margin-right:10px;"></i>我的项目</span>
-                    <span class="text-muted" style="font-size:12px;color:var(--text-tertiary);">协作清单在此查看</span>
+                    <span class="text-muted" style="font-size:12px;color:var(--text-tertiary);">生产中 / 货运 · 可开「精选」同步首页</span>
                 </div>
                 <div id="meProjectListRoot" class="project-list"></div>
             </div>
@@ -7072,16 +7072,13 @@
         async function loadHomeCases() {
             const root = document.getElementById('homeCaseList');
             if (!root) return;
+            const localCards = buildLocalFeaturedCaseCards();
             try {
                 const res = await fetch('showcase.json?v=' + Date.now(), { cache: 'no-store' });
                 if (!res.ok) throw new Error('无法加载案例');
                 const data = await res.json();
                 const cases = (data.cases || []).slice().sort((a, b) => (a.order || 0) - (b.order || 0));
-                if (!cases.length) {
-                    root.innerHTML = '<div class="mp-empty card"><div class="mp-empty-title">暂无精选案例</div><button type="button" class="btn btn-ghost" data-go-shop>先去资源选品</button></div>';
-                    return;
-                }
-                root.innerHTML = cases.map((c) => {
+                const remoteHtml = cases.map((c) => {
                     const cover = cdnifyImageUrl(c.cover);
                     const detail = cdnifyImageUrl(c.detail || c.cover);
                     const tag = [c.projectType, c.status].filter(Boolean).join(' · ');
@@ -7092,18 +7089,27 @@
                     const h5Url = String(c.h5Url || '').replace(/"/g, '');
                     const h5Attr = h5Url ? ' data-h5-url="' + h5Url + '"' : '';
                     const detailAttr = detail ? ' data-detail-url="' + String(detail).replace(/"/g, '') + '"' : '';
-                    const h5Hint = h5Url ? ' · H5' : '';
                     return '<article class="mp-case-card card" data-case-id="' + id + '" data-case-channel="' + channel + '"' + h5Attr + detailAttr + '>' +
                         '<div class="mp-case-cover-wrap">' +
                         (cover ? '<img class="mp-case-cover" src="' + cover + '" alt="' + title + '" loading="lazy" referrerpolicy="no-referrer" />' : '<div class="mp-case-cover-wrap" style="min-height:140px;display:flex;align-items:center;justify-content:center;color:#6b7280;">' + tag + '</div>') +
                         '</div>' +
                         '<div class="mp-case-body">' +
-                        '<div class="mp-case-tag">' + tag + h5Hint + '</div>' +
+                        '<div class="mp-case-tag">' + tag + '</div>' +
                         '<div class="mp-case-title">' + title + '</div>' +
                         '<div class="mp-case-summary">' + summary + '</div>' +
                         '</div></article>';
-                }).join('');
+                });
+                const all = localCards.concat(remoteHtml);
+                if (!all.length) {
+                    root.innerHTML = '<div class="mp-empty card"><div class="mp-empty-title">暂无精选案例</div><button type="button" class="btn btn-ghost" data-go-shop>先去资源选品</button></div>';
+                    return;
+                }
+                root.innerHTML = all.join('');
             } catch (err) {
+                if (localCards.length) {
+                    root.innerHTML = localCards.join('');
+                    return;
+                }
                 root.innerHTML = '<div class="mp-empty card"><div class="mp-empty-title">案例读取失败，可先去资源选品</div><button type="button" class="btn btn-ghost" data-go-shop>资源选品</button></div>';
             }
         }
@@ -7137,6 +7143,17 @@
             document.getElementById('homeCaseList')?.addEventListener('click', function (e) {
                 const card = e.target.closest('.mp-case-card');
                 if (!card) return;
+                const localId = card.getAttribute('data-local-project-id');
+                if (localId) {
+                    const pid = decodeURIComponent(localId);
+                    switchPage('page-me');
+                    requestAnimationFrame(() => {
+                        const shell = document.querySelector(`.project-shell[data-project-id="${pid}"]`);
+                        shell?.classList.add('is-open');
+                        shell?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                    return;
+                }
                 const h5 = card.getAttribute('data-h5-url');
                 if (h5) {
                     location.href = h5;
@@ -8181,7 +8198,7 @@
 
         const PROJECT_TAB_STATUS = {
             'page-projects': ['设计中', '待确认'],
-            'page-me': ['已完成'],
+            'page-me': ['生产中', '运输中', '已完成'],
         };
 
         const IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=320&h=180&fit=crop&auto=format&q=80';
@@ -10182,6 +10199,7 @@
             const isSub = opts.level === 'sub';
             const showCheckbox = !isSub && opts.showCheckbox !== false;
             const showConfirm = ['设计中', '待确认'].includes(p.status);
+            const showFeaturedToggle = PROJECT_TAB_STATUS['page-me'].includes(p.status) && !isSub;
             const childrenHtml = p.children?.length
                 ? `<div class="project-sub-list">${p.children.map(c => renderProjectShell(c, { level: 'sub', showCheckbox: false })).join('')}</div>`
                 : '';
@@ -10191,6 +10209,9 @@
             const confirmBtn = showConfirm
                 ? `<button type="button" class="text-action btn-confirm-scheme" data-confirm-project="${p.id}">确认方案</button>`
                 : `<span class="shell-action-slot shell-action-slot--confirm" aria-hidden="true"></span>`;
+            const featuredBtn = showFeaturedToggle
+                ? `<button type="button" class="text-action ${p.showOnHomeFeatured ? 'is-featured-on' : ''}" data-toggle-home-featured="${p.id}" title="与项目内容同步到本机首页精选">${p.showOnHomeFeatured ? '精选·开' : '精选·关'}</button>`
+                : '';
             const expandBtn = `<button type="button" class="shell-expand-btn" data-toggle-shell-btn data-project-id="${p.id}" aria-label="展开或收起方案详情"></button>`;
             const statusSlot = statusBadge || `<span class="shell-action-slot shell-action-slot--status" aria-hidden="true"></span>`;
             const totalActionHtml = !isSub
@@ -10199,6 +10220,7 @@
             const actionsDesktopHtml = `<div class="shell-hd-row1-actions shell-hd-row1-actions--desktop">
                             ${totalActionHtml}
                             ${statusSlot}
+                            ${featuredBtn}
                             ${confirmBtn}
                             ${expandBtn}
                         </div>`;
@@ -10209,6 +10231,7 @@
                             ${expandBtn}
                         </div>`
                 : `<div class="shell-hd-row1-actions shell-hd-row1-actions--mobile">
+                            ${featuredBtn}
                             ${expandBtn}
                         </div>`;
             const hdInner = isSub
@@ -10312,6 +10335,8 @@
                 if (!ok) return;
                 persistLocalProjects();
                 refreshProjectShell(ctx.projectId);
+                const featured = findProjectById(ctx.projectId)?.showOnHomeFeatured;
+                if (featured) loadHomeCases();
                 const sectionName = ctx.sectionLabel || MEDIA_SECTION_KEYS[ctx.mediaKey]?.label || '版块';
                 const catPart = ctx.categoryLabel ? ` · ${ctx.categoryLabel}` : '';
                 showToast('✅ 图片已添加', `已加入「${sectionName}${catPart}」（本机保存）`);
@@ -10745,8 +10770,14 @@
                 const confirmBtn = e.target.closest('[data-confirm-project]');
                 if (confirmBtn) {
                     e.stopPropagation();
-                    const p = findProjectById(confirmBtn.dataset.confirmProject);
-                    showToast('✅ 方案已确认', `「${p?.name || '项目'}」进入生产环节`);
+                    confirmProjectScheme(confirmBtn.dataset.confirmProject);
+                    return;
+                }
+
+                const featuredToggle = e.target.closest('[data-toggle-home-featured]');
+                if (featuredToggle) {
+                    e.stopPropagation();
+                    toggleProjectHomeFeatured(featuredToggle.dataset.toggleHomeFeatured);
                     return;
                 }
 
@@ -10915,8 +10946,98 @@
 
         function handleProjectDetailAction(text) {
             if (text.includes('确认方案')) {
-                showToast('✅ 方案已确认', '设计方案已确认，进入生产环节');
+                /* 真实确认走 data-confirm-project → confirmProjectScheme */
             }
+        }
+
+        function pickProjectCoverUrl(p) {
+            if (!p) return '';
+            const pools = [
+                p.comm?.designerImages,
+                p.comm?.clientImages,
+                p.comm?.clientFeedbackImages,
+            ];
+            for (const list of pools) {
+                const url = list?.[0]?.url;
+                if (url) return url;
+            }
+            try {
+                const prod = normalizeProductionMedia(p.production);
+                for (const c of PRODUCTION_CATEGORIES) {
+                    const url = prod.categories?.[c.id]?.[0]?.url;
+                    if (url) return url;
+                }
+            } catch (_) {}
+            return '';
+        }
+
+        function confirmProjectScheme(projectId) {
+            const p = findProjectById(projectId);
+            if (!p) {
+                showToast('未找到方案', '请刷新后重试');
+                return;
+            }
+            if (!['设计中', '待确认'].includes(p.status)) {
+                showToast('无需重复确认', `当前状态：${p.status}`);
+                switchPage('page-me');
+                return;
+            }
+            p.status = '生产中';
+            p.statusClass = 'badge-warning';
+            p.updatedFull = new Date().toISOString().slice(0, 10);
+            if (p.showOnHomeFeatured == null) p.showOnHomeFeatured = false;
+            persistLocalProjects();
+            renderProjects();
+            updateSelection();
+            loadHomeCases();
+            switchPage('page-me');
+            requestAnimationFrame(() => {
+                document.querySelector(`.project-shell[data-project-id="${p.id}"]`)?.classList.add('is-open');
+            });
+            showToast('方案已确认', '已移到「我的」· 可记录生产/货运；需要时打开「首页精选」同步到首页');
+        }
+
+        function toggleProjectHomeFeatured(projectId) {
+            const p = findProjectById(projectId);
+            if (!p) return;
+            if (!PROJECT_TAB_STATUS['page-me'].includes(p.status)) {
+                showToast('请先确认方案', '确认后进入「我的」再同步首页精选');
+                return;
+            }
+            p.showOnHomeFeatured = !p.showOnHomeFeatured;
+            if (p.showOnHomeFeatured && !pickProjectCoverUrl(p)) {
+                showToast('建议先上传效果图', '精选封面将使用方案/沟通中的第一张图');
+            }
+            persistLocalProjects();
+            renderProjects();
+            loadHomeCases();
+            showToast(
+                p.showOnHomeFeatured ? '已同步到首页精选' : '已从首页精选移除',
+                p.showOnHomeFeatured ? '本机首页可见；公开全网精选需后续管理员推送' : '仅关闭首页展示，项目仍在「我的」'
+            );
+        }
+
+        function buildLocalFeaturedCaseCards() {
+            return getTopLevelProjects()
+                .filter(p => p.showOnHomeFeatured && PROJECT_TAB_STATUS['page-me'].includes(p.status))
+                .map((p, idx) => {
+                    const cover = pickProjectCoverUrl(p);
+                    const title = String(p.name || '本机方案').replace(/</g, '&lt;');
+                    const summary = String(p.address || p.projectType || '来自本机项目 · 与生产进度同步').replace(/</g, '&lt;');
+                    const tag = [p.projectType || '本机方案', p.status].filter(Boolean).join(' · ');
+                    const coverAttr = cover ? ' data-detail-url="' + String(cover).replace(/"/g, '') + '"' : '';
+                    return '<article class="mp-case-card card" data-local-project-id="' + encodeURIComponent(p.id) + '"' + coverAttr + '>' +
+                        '<div class="mp-case-cover-wrap">' +
+                        (cover
+                            ? '<img class="mp-case-cover" src="' + cover + '" alt="' + title + '" loading="lazy" referrerpolicy="no-referrer" />'
+                            : '<div style="min-height:140px;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:13px;">暂无封面图</div>') +
+                        '</div>' +
+                        '<div class="mp-case-body">' +
+                        '<div class="mp-case-tag">' + tag + ' · 本机同步</div>' +
+                        '<div class="mp-case-title">' + title + '</div>' +
+                        '<div class="mp-case-summary">' + summary + '</div>' +
+                        '</div></article>';
+                });
         }
 
         function toggleFavoritesGrid(toggleEl) {
