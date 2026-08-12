@@ -6612,9 +6612,9 @@
                 </div>
                 <div id="projectListRoot" class="project-list"></div>
 
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0 16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0 16px;" id="projectsSelectionBar">
                     <span class="text-muted" style="color:var(--text-secondary);font-size:14px;">已选 <span id="selectedCount">0</span> 个方案，总价：<strong id="selectedTotal" class="price-grand">¥0</strong></span>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;" id="projectsSelectionActions" hidden>
                         <div class="merge-action-wrap" id="mergeActionWrap">
                             <button type="button" class="text-action btn-merge-projects" id="mergeProjectsBtn">合并方案</button>
                             <div class="merge-hint" id="mergeHint" role="dialog" aria-label="合并方案预览">
@@ -6710,7 +6710,15 @@
                     <span><i class="fas fa-tasks" style="color:var(--primary);margin-right:10px;"></i>我的项目</span>
                     <span class="text-muted" style="font-size:12px;color:var(--text-tertiary);">生产中 / 货运 · 可开「精选」同步首页</span>
                 </div>
+                <div class="project-list-toolbar">
+                    <label><input type="checkbox" id="selectAllMe" /> 全选方案</label>
+                    <span class="text-muted" style="color:var(--text-tertiary);font-size:12px;">勾选后可删除</span>
+                </div>
                 <div id="meProjectListRoot" class="project-list"></div>
+                <div class="project-selection-bar" id="meSelectionBar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0 8px;">
+                    <span class="text-muted" style="color:var(--text-secondary);font-size:14px;">已选 <span id="selectedCountMe">0</span> 个方案，总价：<strong id="selectedTotalMe" class="price-grand">¥0</strong></span>
+                    <button type="button" class="text-action is-muted-danger" id="deleteMeProjectsBtn" hidden>删除</button>
+                </div>
             </div>
 
             <!-- 收藏 -->
@@ -8634,10 +8642,10 @@
         }
 
         async function exportLocalProjectsPack() {
-            const selectedIds = getSelectedProjectIds();
+            const selectedIds = getSelectedProjectIds(document.getElementById('projectListRoot'));
             let list = selectedIds.length
                 ? projectsData.filter(p => selectedIds.includes(p.id))
-                : getTopLevelProjects();
+                : getTopLevelProjects().filter(p => (PROJECT_TAB_STATUS['page-projects'] || []).includes(p.status));
             if (!list.length) {
                 showToast('没有可传出的方案', '请先新建或勾选方案');
                 return;
@@ -10671,8 +10679,18 @@
             return null;
         }
 
-        function getSelectedProjectIds() {
-            return [...document.querySelectorAll('.project-check:checked')]
+        function getProjectListRoot(pageId) {
+            if (pageId === 'page-me') return document.getElementById('meProjectListRoot');
+            if (pageId === 'page-projects') return document.getElementById('projectListRoot');
+            const mePage = document.getElementById('page-me');
+            if (mePage?.classList.contains('active')) return document.getElementById('meProjectListRoot');
+            return document.getElementById('projectListRoot');
+        }
+
+        function getSelectedProjectIds(rootEl) {
+            const root = rootEl || getProjectListRoot();
+            const scope = root || document;
+            return [...scope.querySelectorAll('.project-check:checked')]
                 .map(cb => cb.dataset.projectId)
                 .filter(Boolean);
         }
@@ -10706,7 +10724,7 @@
             if (!btn || !meta) return;
 
             const selected = projectsData.filter(p => {
-                const cb = document.querySelector(`.project-check[data-project-id="${p.id}"]`);
+                const cb = document.querySelector(`#projectListRoot .project-check[data-project-id="${p.id}"]`);
                 return cb?.checked;
             });
             const canSplit = selected.length === 1 && selected[0].children?.length > 0;
@@ -10785,7 +10803,7 @@
         }
 
         function handleMergeOrSplit() {
-            const selectedIds = getSelectedProjectIds();
+            const selectedIds = getSelectedProjectIds(document.getElementById('projectListRoot'));
             if (selectedIds.length === 1) {
                 const p = projectsData.find(x => x.id === selectedIds[0]);
                 if (p?.children?.length) {
@@ -10797,7 +10815,7 @@
         }
 
         function mergeSelectedProjects() {
-            const selectedIds = getSelectedProjectIds();
+            const selectedIds = getSelectedProjectIds(document.getElementById('projectListRoot'));
             if (selectedIds.length < 2) {
                 showToast('⚠️ 请至少勾选 2 个项目', '合并需要选择多个项目');
                 return;
@@ -10861,12 +10879,13 @@
             showToast('✅ 项目已合并', `「${mergedName}」包含 ${children.length} 个子项目`);
         }
 
-        function deleteSelectedProjects() {
-            const selectedIds = getSelectedProjectIds();
+        function deleteSelectedProjects(rootEl) {
+            const selectedIds = getSelectedProjectIds(rootEl);
             if (!selectedIds.length) {
                 showToast('⚠️ 请先勾选项目', '选择要删除的项目');
                 return;
             }
+            if (!window.confirm(`确定删除已勾选的 ${selectedIds.length} 个方案？`)) return;
             selectedIds.forEach(id => {
                 const idx = projectsData.findIndex(p => p.id === id);
                 if (idx !== -1) projectsData.splice(idx, 1);
@@ -10876,7 +10895,8 @@
             renderProjects();
             updateSelection();
             updateMergeHint();
-            showToast('🗑️ 已删除', `已删除 ${selectedIds.length} 个项目`);
+            if (typeof loadHomeCases === 'function') loadHomeCases();
+            showToast('🗑️ 已删除', `已删除 ${selectedIds.length} 个方案`);
         }
 
         function initProjectShellInteractions() {
@@ -11072,7 +11092,12 @@
                 }
 
                 if (e.target.closest('#deleteProjectsBtn')) {
-                    deleteSelectedProjects();
+                    deleteSelectedProjects(document.getElementById('projectListRoot'));
+                    return;
+                }
+                if (e.target.closest('#deleteMeProjectsBtn')) {
+                    deleteSelectedProjects(document.getElementById('meProjectListRoot'));
+                    return;
                 }
             });
 
@@ -11199,16 +11224,25 @@
         }
 
         function updateSelection() {
-            const checked = document.querySelectorAll('.project-check:checked');
-            const countEl = document.getElementById('selectedCount');
-            const totalEl = document.getElementById('selectedTotal');
-            let total = 0;
-            checked.forEach(cb => {
-                const row = cb.closest('.project-shell');
-                if (row) total += Number(row.dataset.price || 0);
-            });
-            if (countEl) countEl.textContent = String(checked.length);
-            if (totalEl) totalEl.textContent = '¥' + total.toLocaleString();
+            const syncBar = (rootId, countId, totalId, actionsId) => {
+                const root = document.getElementById(rootId);
+                const countEl = document.getElementById(countId);
+                const totalEl = document.getElementById(totalId);
+                const actionsEl = document.getElementById(actionsId);
+                const checked = root
+                    ? [...root.querySelectorAll('.project-check:checked')]
+                    : [];
+                let total = 0;
+                checked.forEach(cb => {
+                    const row = cb.closest('.project-shell');
+                    if (row) total += Number(row.dataset.price || 0);
+                });
+                if (countEl) countEl.textContent = String(checked.length);
+                if (totalEl) totalEl.textContent = '¥' + total.toLocaleString();
+                if (actionsEl) actionsEl.hidden = checked.length === 0;
+            };
+            syncBar('projectListRoot', 'selectedCount', 'selectedTotal', 'projectsSelectionActions');
+            syncBar('meProjectListRoot', 'selectedCountMe', 'selectedTotalMe', 'deleteMeProjectsBtn');
             updateMergeHint();
         }
 
@@ -11535,7 +11569,15 @@
             if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement)) return;
 
             if (el.id === 'selectAll') {
-                document.querySelectorAll('.project-check').forEach(c => { c.checked = el.checked; });
+                document.querySelectorAll('#projectListRoot .project-check').forEach(c => { c.checked = el.checked; });
+                getProjectsForPage('page-projects').forEach(p => { p.checked = el.checked; });
+                updateSelection();
+                return;
+            }
+
+            if (el.id === 'selectAllMe') {
+                document.querySelectorAll('#meProjectListRoot .project-check').forEach(c => { c.checked = el.checked; });
+                getProjectsForPage('page-me').forEach(p => { p.checked = el.checked; });
                 updateSelection();
                 return;
             }
@@ -11543,6 +11585,13 @@
             if (el.classList.contains('project-check')) {
                 const p = projectsData.find(x => x.id === el.dataset.projectId);
                 if (p) p.checked = el.checked;
+                const inMe = !!el.closest('#meProjectListRoot');
+                const selectAll = document.getElementById(inMe ? 'selectAllMe' : 'selectAll');
+                if (selectAll) {
+                    const root = document.getElementById(inMe ? 'meProjectListRoot' : 'projectListRoot');
+                    const boxes = root ? [...root.querySelectorAll('.project-check')] : [];
+                    selectAll.checked = boxes.length > 0 && boxes.every(c => c.checked);
+                }
                 updateSelection();
             }
         });
