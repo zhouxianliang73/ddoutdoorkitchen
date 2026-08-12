@@ -2310,6 +2310,37 @@
         .btn-confirm-scheme {
             flex-shrink: 0;
         }
+        .btn-featured-toggle {
+            flex-shrink: 0;
+            min-width: 44px;
+            height: 28px;
+            padding: 0 10px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text-muted);
+            font-size: var(--fs-sm);
+            font-weight: var(--fw-medium);
+            cursor: pointer;
+            box-shadow: var(--elevation-1);
+            transition: background 0.15s, color 0.15s, box-shadow 0.15s, border-color 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-featured-toggle:hover {
+            border-color: var(--border);
+            color: var(--text);
+        }
+        .btn-featured-toggle:active {
+            transform: translateY(1px);
+        }
+        .btn-featured-toggle.is-on,
+        .btn-featured-toggle[aria-pressed="true"] {
+            background: var(--surface-inset);
+            border-color: var(--accent, #2a6b4f);
+            color: var(--accent, #2a6b4f);
+            box-shadow: var(--shadow-inset);
+            font-weight: var(--fw-semibold, 600);
+        }
         .project-shell-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -10042,13 +10073,13 @@
         }
 
         function renderCommSectionsHtml(comm, projectId) {
-            if (!comm) return '';
-            const uploadSummary = comm.commImagesSummary || comm.clientUploadSummary || '沟通中的参考图片';
-            const commImages = comm.commImages || comm.clientImages || [];
+            const c = comm || {};
+            const uploadSummary = c.commImagesSummary || c.clientUploadSummary || '沟通中的参考图片';
+            const commImages = c.commImages || c.clientImages || [];
             return `
                 ${renderSummaryStripSection('沟通图片', uploadSummary, commImages, '', { projectId, mediaKey: 'clientImages', sectionLabel: '沟通图片' })}
-                ${renderClientFeedbackSection(comm, projectId)}
-                ${renderSchemeVersionsSection(comm, projectId)}
+                ${renderClientFeedbackSection(c, projectId)}
+                ${renderSchemeVersionsSection(c, projectId)}
             `;
         }
 
@@ -10073,10 +10104,9 @@
         function renderTrackingTimelineHtml(p) {
             const ship = normalizeShippingMedia(p.shipping);
             const records = ship.records || [];
-            if (!records.length && !ship.summary) return '';
             const lines = records.length
                 ? records.map(r => `<div class="tracking-line"><span class="muted">${r.date || ''}</span> ${r.title || r.tracking || ''}</div>`).join('')
-                : `<div class="tracking-line">${ship.summary}</div>`;
+                : `<div class="tracking-line">${ship.summary || '暂无物流信息'}</div>`;
             return `
                 <section class="proj-section proj-collapsible" data-section="tracking">
                     <div class="proj-section-hd" data-toggle-section>
@@ -10111,13 +10141,14 @@
                 ${renderCategorizedMediaSection('货运记录', SHIPPING_CATEGORIES, ship, p.id, 'shipping')}
                 ${renderTrackingTimelineHtml(p)}`
                 : '';
-            const schemeTail = phase === 'scheme' && showComm
+            // 「我的」保留项目清单/沟通/方案，并追加订单·生产·货运；「项目」仅协作段
+            const schemeTail = showComm
                 ? `${renderProjectPdfBarHtml(p.id)}
                 ${['设计中', '待确认'].includes(p.status) ? renderCommPlatformBarHtml(p.id) : ''}`
                 : '';
             return `
                 ${quoteHtml}
-                ${phase === 'scheme' ? commHtml : ''}
+                ${commHtml}
                 ${deliveryHtml}
                 ${schemeTail}
             `;
@@ -10210,7 +10241,7 @@
                 ? `<button type="button" class="text-action btn-confirm-scheme" data-confirm-project="${p.id}">确认方案</button>`
                 : `<span class="shell-action-slot shell-action-slot--confirm" aria-hidden="true"></span>`;
             const featuredBtn = showFeaturedToggle
-                ? `<button type="button" class="text-action ${p.showOnHomeFeatured ? 'is-featured-on' : ''}" data-toggle-home-featured="${p.id}" title="与项目内容同步到本机首页精选">${p.showOnHomeFeatured ? '精选·开' : '精选·关'}</button>`
+                ? `<button type="button" class="btn-featured-toggle${p.showOnHomeFeatured ? ' is-on' : ''}" data-toggle-home-featured="${p.id}" aria-pressed="${p.showOnHomeFeatured ? 'true' : 'false'}" aria-label="精选开关" title="按下同步到本机首页精选，再按取消">精选</button>`
                 : '';
             const expandBtn = `<button type="button" class="shell-expand-btn" data-toggle-shell-btn data-project-id="${p.id}" aria-label="展开或收起方案详情"></button>`;
             const statusSlot = statusBadge || `<span class="shell-action-slot shell-action-slot--status" aria-hidden="true"></span>`;
@@ -10740,8 +10771,22 @@
                     return;
                 }
 
+                const confirmBtn = e.target.closest('[data-confirm-project]');
+                if (confirmBtn) {
+                    e.stopPropagation();
+                    confirmProjectScheme(confirmBtn.dataset.confirmProject);
+                    return;
+                }
+
+                const featuredToggle = e.target.closest('[data-toggle-home-featured]');
+                if (featuredToggle) {
+                    e.stopPropagation();
+                    toggleProjectHomeFeatured(featuredToggle.dataset.toggleHomeFeatured);
+                    return;
+                }
+
                 const shellHd = e.target.closest('.project-shell-hd');
-                if (shellHd && !e.target.closest('.project-check') && !e.target.closest('.project-name-input') && !e.target.closest('.btn-confirm-scheme') && !e.target.closest('[data-toggle-shell-btn]')) {
+                if (shellHd && !e.target.closest('.project-check') && !e.target.closest('.project-name-input') && !e.target.closest('.btn-confirm-scheme') && !e.target.closest('[data-toggle-shell-btn]') && !e.target.closest('[data-toggle-home-featured]') && !e.target.closest('[data-confirm-project]')) {
                     e.stopPropagation();
                     const shell = shellHd.closest('.project-shell');
                     if (!shell) return;
@@ -10764,20 +10809,6 @@
                 if (recordHd) {
                     e.stopPropagation();
                     recordHd.closest('.record-item')?.classList.toggle('is-open');
-                    return;
-                }
-
-                const confirmBtn = e.target.closest('[data-confirm-project]');
-                if (confirmBtn) {
-                    e.stopPropagation();
-                    confirmProjectScheme(confirmBtn.dataset.confirmProject);
-                    return;
-                }
-
-                const featuredToggle = e.target.closest('[data-toggle-home-featured]');
-                if (featuredToggle) {
-                    e.stopPropagation();
-                    toggleProjectHomeFeatured(featuredToggle.dataset.toggleHomeFeatured);
                     return;
                 }
 
@@ -11079,7 +11110,7 @@
             }
 
             const projectShell = target.closest('.project-shell[data-level="main"]');
-            if (projectShell?.dataset.projectId && !target.closest('.project-check') && !target.closest('.project-name-input') && !target.closest('.btn-confirm-scheme') && !target.closest('[data-lightbox]') && !target.closest('[data-toggle-shell-btn]') && !target.closest('[data-toggle-section]') && !target.closest('[data-goto-shop]') && !target.closest('[data-quote-view-toggle]')) {
+            if (projectShell?.dataset.projectId && !target.closest('.project-check') && !target.closest('.project-name-input') && !target.closest('.btn-confirm-scheme') && !target.closest('[data-toggle-home-featured]') && !target.closest('[data-confirm-project]') && !target.closest('[data-lightbox]') && !target.closest('[data-toggle-shell-btn]') && !target.closest('[data-toggle-section]') && !target.closest('[data-goto-shop]') && !target.closest('[data-quote-view-toggle]')) {
                 activeProjectId = projectShell.dataset.projectId;
                 document.querySelectorAll('.project-shell').forEach(el => {
                     el.classList.toggle('is-active', el.dataset.projectId === activeProjectId);
