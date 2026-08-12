@@ -2608,6 +2608,42 @@
             font: inherit;
             color: inherit;
         }
+        .media-strip-item-wrap {
+            position: relative;
+            flex: 0 0 var(--quote-col-unit);
+            min-width: var(--quote-col-unit);
+            max-width: var(--quote-col-unit);
+            scroll-snap-align: start;
+        }
+        .media-strip-item-wrap .media-strip-item {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            flex: none;
+        }
+        .media-strip-del {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            z-index: 2;
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background: rgba(20, 20, 20, 0.72);
+            color: #fff;
+            font-size: 14px;
+            line-height: 22px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
+        .media-strip-del:hover,
+        .media-strip-del:focus-visible {
+            background: rgba(180, 40, 40, 0.92);
+            outline: none;
+        }
         .media-strip-item--preview {
             cursor: inherit;
             pointer-events: none;
@@ -3110,6 +3146,12 @@
             max-width: none;
             flex: none;
             aspect-ratio: unset;
+        }
+        .media-category-grid .media-strip-item-wrap {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            flex: none;
         }
         .media-category-grid .media-strip-thumb {
             flex: none;
@@ -8973,6 +9015,14 @@
             return `${mm}-${dd} ${hh}:${mi}`;
         }
 
+        function getCommClientImages(projectOrComm) {
+            const c = projectOrComm?.comm ? projectOrComm.comm : (projectOrComm || {});
+            if (Array.isArray(c.clientImages) && c.clientImages.length) return c.clientImages;
+            if (Array.isArray(c.commImages) && c.commImages.length) return c.commImages;
+            if (Array.isArray(c.clientImages)) return c.clientImages;
+            return Array.isArray(c.commImages) ? c.commImages : [];
+        }
+
         function getMediaImageList(project, mediaKey) {
             if (!project) return [];
             if (mediaKey === 'production') {
@@ -8982,6 +9032,9 @@
             if (mediaKey === 'shipping') {
                 const normalized = normalizeShippingMedia(project.shipping);
                 return SHIPPING_CATEGORIES.flatMap(c => normalized.categories[c.id] || []);
+            }
+            if (mediaKey === 'clientImages' || mediaKey === 'commImages') {
+                return getCommClientImages(project);
             }
             return project.comm?.[mediaKey] || [];
         }
@@ -9002,7 +9055,118 @@
                 return;
             }
             if (!project.comm) project.comm = {};
+            if (mediaKey === 'clientImages' || mediaKey === 'commImages') {
+                project.comm.clientImages = images;
+                project.comm.commImages = images;
+                return;
+            }
             project.comm[mediaKey] = images;
+        }
+
+        function setCategorizedMediaImages(project, sectionKey, categoryId, images) {
+            if (sectionKey === 'production') {
+                if (!project.production || typeof project.production !== 'object' || Array.isArray(project.production)) {
+                    project.production = normalizeProductionMedia(project.production);
+                }
+                if (!project.production.categories) project.production.categories = {};
+                project.production.categories[categoryId] = images;
+                return true;
+            }
+            if (sectionKey === 'shipping') {
+                if (!project.shipping || typeof project.shipping !== 'object' || Array.isArray(project.shipping)) {
+                    project.shipping = normalizeShippingMedia(project.shipping);
+                }
+                if (!project.shipping.categories) project.shipping.categories = {};
+                project.shipping.categories[categoryId] = images;
+                return true;
+            }
+            return false;
+        }
+
+        function removeMediaImage(projectId, mediaKey, imageIndex, categoryId = null, listSource = '', listIndex = '') {
+            const p = findProjectById(projectId);
+            if (!p || mediaKey == null || imageIndex === '' || imageIndex == null) return false;
+            const idx = Number(imageIndex);
+            if (!Number.isFinite(idx) || idx < 0) return false;
+
+            const dropFrom = (arr) => {
+                const sorted = sortMediaImagesByDate(arr);
+                const target = sorted[idx];
+                if (!target?.url) return null;
+                return (arr || []).filter(img => img && img.url !== target.url);
+            };
+
+            if ((mediaKey === 'production' || mediaKey === 'shipping') && categoryId) {
+                const list = getCategorizedMediaImages(p, mediaKey, categoryId);
+                const next = dropFrom(list);
+                if (!next) return false;
+                setCategorizedMediaImages(p, mediaKey, categoryId, next);
+                p.updatedFull = new Date().toISOString().slice(0, 10);
+                return true;
+            }
+
+            if (listSource === 'schemeVersion' && p.comm) {
+                const versions = Array.isArray(p.comm.schemeVersions) ? p.comm.schemeVersions : null;
+                let version = null;
+                if (versions?.length) {
+                    const key = String(listIndex || '');
+                    version = versions.find(v => `${v.version || 'V1'}|${v.date || ''}` === key)
+                        || versions[Number(listIndex)];
+                }
+                if (version) {
+                    const sorted = sortMediaImagesByDate(version.images || []);
+                    const target = sorted[idx];
+                    if (!target?.url) return false;
+                    version.images = (version.images || []).filter(img => img && img.url !== target.url);
+                    if (Array.isArray(p.comm.designerImages)) {
+                        p.comm.designerImages = p.comm.designerImages.filter(img => img && img.url !== target.url);
+                    }
+                    p.updatedFull = new Date().toISOString().slice(0, 10);
+                    return true;
+                }
+            }
+
+            if (listSource === 'feedbackDate' && p.comm) {
+                const byDate = Array.isArray(p.comm.clientFeedbackByDate) ? p.comm.clientFeedbackByDate : null;
+                let entry = null;
+                if (byDate?.length) {
+                    const key = String(listIndex || '');
+                    entry = byDate.find(e => String(e.date || '') === key) || byDate[Number(listIndex)];
+                }
+                if (entry) {
+                    const sorted = sortMediaImagesByDate(entry.images || []);
+                    const target = sorted[idx];
+                    if (!target?.url) return false;
+                    entry.images = (entry.images || []).filter(img => img && img.url !== target.url);
+                    if (Array.isArray(p.comm.clientFeedbackImages)) {
+                        p.comm.clientFeedbackImages = p.comm.clientFeedbackImages.filter(img => img && img.url !== target.url);
+                    }
+                    p.updatedFull = new Date().toISOString().slice(0, 10);
+                    return true;
+                }
+            }
+
+            const list = getMediaImageList(p, mediaKey);
+            const next = dropFrom(list);
+            if (!next) return false;
+            const removedUrl = sortMediaImagesByDate(list)[idx]?.url;
+            setMediaImageList(p, mediaKey, next);
+            if (removedUrl && mediaKey === 'designerImages' && Array.isArray(p.comm?.schemeVersions)) {
+                p.comm.schemeVersions.forEach(v => {
+                    if (Array.isArray(v.images)) {
+                        v.images = v.images.filter(img => img && img.url !== removedUrl);
+                    }
+                });
+            }
+            if (removedUrl && mediaKey === 'clientFeedbackImages' && Array.isArray(p.comm?.clientFeedbackByDate)) {
+                p.comm.clientFeedbackByDate.forEach(e => {
+                    if (Array.isArray(e.images)) {
+                        e.images = e.images.filter(img => img && img.url !== removedUrl);
+                    }
+                });
+            }
+            p.updatedFull = new Date().toISOString().slice(0, 10);
+            return true;
         }
 
         function addMediaImage(projectId, mediaKey, imageObj, categoryId) {
@@ -9677,7 +9841,7 @@
                 .sort((a, b) => parseMediaSortTime(b) - parseMediaSortTime(a));
         }
 
-        function renderMediaStripItemHtml(img, interactive, index = 0) {
+        function renderMediaStripItemHtml(img, interactive, index = 0, deleteCtx = null) {
             const noteLine = (img.note || img.caption || img.alt || '—').replace(/"/g, '&quot;');
             const dateLine = formatMediaDateYmd(img);
             const inner = `<div class="media-strip-thumb"><img src="${img.url}" alt="${noteLine}" loading="lazy" referrerpolicy="no-referrer" /></div>
@@ -9687,7 +9851,23 @@
                 </div>`;
             if (interactive) {
                 const safeUrl = (img.url || '').replace(/"/g, '&quot;');
-                return `<button type="button" class="media-strip-item" data-lightbox="${safeUrl}" data-lightbox-index="${index}">${inner}</button>`;
+                const itemBtn = `<button type="button" class="media-strip-item" data-lightbox="${safeUrl}" data-lightbox-index="${index}">${inner}</button>`;
+                if (deleteCtx?.projectId && deleteCtx?.mediaKey) {
+                    const catAttr = deleteCtx.categoryId ? ` data-category-id="${deleteCtx.categoryId}"` : '';
+                    const srcAttr = deleteCtx.listSource ? ` data-list-source="${deleteCtx.listSource}"` : '';
+                    const srcIdxAttr = deleteCtx.listIndex != null && deleteCtx.listIndex !== ''
+                        ? ` data-list-index="${deleteCtx.listIndex}"`
+                        : '';
+                    return `<div class="media-strip-item-wrap">
+                        <button type="button" class="media-strip-del" data-delete-media
+                            data-project-id="${deleteCtx.projectId}"
+                            data-media-key="${deleteCtx.mediaKey}"
+                            data-image-index="${index}"${catAttr}${srcAttr}${srcIdxAttr}
+                            aria-label="删除图片">×</button>
+                        ${itemBtn}
+                    </div>`;
+                }
+                return itemBtn;
             }
             return `<div class="media-strip-item media-strip-item--preview">${inner}</div>`;
         }
@@ -9695,19 +9875,37 @@
         function renderMediaStripRow(images, opts = {}) {
             const list = sortMediaImagesByDate(images);
             const interactive = opts.interactive !== false;
+            const deleteCtx = opts.deletable && opts.projectId && opts.mediaKey
+                ? {
+                    projectId: opts.projectId,
+                    mediaKey: opts.mediaKey,
+                    categoryId: opts.categoryId || null,
+                    listSource: opts.listSource || '',
+                    listIndex: opts.listIndex,
+                }
+                : null;
             if (!list.length) {
                 return `<div class="media-layout-wrap"><div class="media-strip-row media-strip-row--empty"><span class="media-strip-empty-hint">暂无图片</span></div></div>`;
             }
-            return `<div class="media-layout-wrap"><div class="media-strip-row">${list.map((img, i) => renderMediaStripItemHtml(img, interactive, i)).join('')}</div></div>`;
+            return `<div class="media-layout-wrap"><div class="media-strip-row">${list.map((img, i) => renderMediaStripItemHtml(img, interactive, i, deleteCtx)).join('')}</div></div>`;
         }
 
         function renderMediaCategoryGrid(images, opts = {}) {
             const list = sortMediaImagesByDate(images);
             const interactive = opts.interactive !== false;
+            const deleteCtx = opts.deletable && opts.projectId && opts.mediaKey
+                ? {
+                    projectId: opts.projectId,
+                    mediaKey: opts.mediaKey,
+                    categoryId: opts.categoryId || null,
+                    listSource: opts.listSource || '',
+                    listIndex: opts.listIndex,
+                }
+                : null;
             if (!list.length) {
                 return `<div class="media-cat-empty">暂无图片</div>`;
             }
-            return `<div class="media-layout-wrap media-layout-wrap--grid"><div class="media-category-grid">${list.map((img, i) => renderMediaStripItemHtml(img, interactive, i)).join('')}</div></div>`;
+            return `<div class="media-layout-wrap media-layout-wrap--grid"><div class="media-category-grid">${list.map((img, i) => renderMediaStripItemHtml(img, interactive, i, deleteCtx)).join('')}</div></div>`;
         }
 
         function renderImageStripBar(images) {
@@ -9871,16 +10069,26 @@
             }).join('')}</ul>`;
         }
 
-        function renderFeedbackDateBlock(entry) {
+        function renderFeedbackDateBlock(entry, mediaCtx = null, listIndex = 0) {
             const dateLabel = entry.date ? formatMediaDateYmd({ date: entry.date }) : '—';
             const images = (entry.images || []).filter(img => img && img.url);
             const itemsHtml = entry.items?.length
                 ? renderCommContentItemsHtml(entry.items)
                 : `<div class="section-text-card"><p class="section-summary">${entry.summary || '—'}</p></div>`;
             if (images.length) {
+                const stripOpts = mediaCtx
+                    ? {
+                        interactive: true,
+                        deletable: true,
+                        projectId: mediaCtx.projectId,
+                        mediaKey: mediaCtx.mediaKey,
+                        listSource: mediaCtx.listSource || 'feedbackDate',
+                        listIndex,
+                    }
+                    : { interactive: true };
                 return `<article class="feedback-date-block feedback-date-block--annotated">
                     <div class="feedback-date-label">${dateLabel}</div>
-                    <div class="media-strip-wrap img-strip-wrap">${renderMediaStripRow(images, { interactive: true })}</div>
+                    <div class="media-strip-wrap img-strip-wrap">${renderMediaStripRow(images, stripOpts)}</div>
                     ${itemsHtml}
                 </article>`;
             }
@@ -9911,11 +10119,20 @@
             const mediaCtx = { projectId, mediaKey: 'designerImages', sectionLabel: '方案版本' };
             const addRow = renderMediaAddRowHtml(mediaCtx);
             const blocksHtml = versions.length
-                ? versions.map(v => {
+                ? versions.map((v, vIdx) => {
                     const images = (v.images || []).filter(img => img && img.url);
                     const dateLabel = v.date ? formatMediaDateYmd({ date: v.date }) : '';
                     const imgHtml = images.length
-                        ? `<div class="media-strip-wrap img-strip-wrap">${renderMediaStripRow(images, { interactive: true })}</div>`
+                        ? `<div class="media-strip-wrap img-strip-wrap">${renderMediaStripRow(images, {
+                            interactive: true,
+                            deletable: true,
+                            projectId,
+                            mediaKey: 'designerImages',
+                            listSource: Array.isArray(comm.schemeVersions) && comm.schemeVersions.length ? 'schemeVersion' : '',
+                            listIndex: Array.isArray(comm.schemeVersions) && comm.schemeVersions.length
+                                ? `${v.version || 'V1'}|${v.date || ''}`
+                                : vIdx,
+                        })}</div>`
                         : '';
                     return `<article class="scheme-version-block">
                         <div class="scheme-version-hd">
@@ -9957,8 +10174,13 @@
             const entries = normalizeClientFeedbackEntries(comm);
             const mediaCtx = { projectId, mediaKey: 'clientFeedbackImages', sectionLabel: '沟通内容' };
             const addRow = renderMediaAddRowHtml(mediaCtx);
+            const hasByDate = Array.isArray(comm?.clientFeedbackByDate) && comm.clientFeedbackByDate.length;
             const blocksHtml = entries.length
-                ? entries.map(renderFeedbackDateBlock).join('')
+                ? entries.map((entry, i) => renderFeedbackDateBlock(entry, {
+                    projectId,
+                    mediaKey: 'clientFeedbackImages',
+                    listSource: hasByDate ? 'feedbackDate' : '',
+                }, hasByDate ? (entry.date || i) : i)).join('')
                 : `<div class="feedback-date-block feedback-date-block--text"><div class="section-text-card"><p class="section-summary">暂无沟通记录</p></div></div>`;
             const annotatedEntry = entries.find(e => (e.images || []).some(img => img?.url));
             const previewImages = annotatedEntry?.images || [];
@@ -9993,7 +10215,13 @@
                 ? renderMediaStripRow(images, { interactive: false })
                 : `<div class="media-cat-empty">暂无图片</div>`;
             const expanded = count
-                ? renderMediaCategoryGrid(images, { interactive: true })
+                ? renderMediaCategoryGrid(images, {
+                    interactive: true,
+                    deletable: true,
+                    projectId: ctx.projectId,
+                    mediaKey: ctx.mediaKey,
+                    categoryId: cat.id,
+                })
                 : `<div class="media-cat-empty">暂无图片</div>`;
             const label = (ctx.sectionLabel || '').replace(/"/g, '&quot;');
             const commonAttrs = `data-project-id="${ctx.projectId}" data-media-key="${ctx.mediaKey}" data-section-label="${label}" data-category-id="${cat.id}" data-category-label="${cat.label}"`;
@@ -10052,7 +10280,13 @@
                 <div class="media-cat-block media-cat-collapsible">
                     <div class="media-cat-preview" data-toggle-media-cat aria-label="展开${title}">${innerPreview}</div>
                     <div class="media-cat-bd">
-                        <div class="media-strip-wrap img-strip-wrap" data-img-strip>${renderMediaCategoryGrid(list, { interactive: true })}</div>
+                        <div class="media-strip-wrap img-strip-wrap" data-img-strip>${renderMediaCategoryGrid(list, {
+                            interactive: true,
+                            deletable: !!(mediaCtx?.projectId && mediaCtx?.mediaKey),
+                            projectId: mediaCtx?.projectId,
+                            mediaKey: mediaCtx?.mediaKey,
+                            categoryId: mediaCtx?.categoryId || null,
+                        })}</div>
                         <div class="section-text-card"><p class="section-summary">${summary || '暂无记录'}</p></div>
                         ${extraHtml}
                         ${addRow}
@@ -10075,7 +10309,7 @@
         function renderCommSectionsHtml(comm, projectId) {
             const c = comm || {};
             const uploadSummary = c.commImagesSummary || c.clientUploadSummary || '沟通中的参考图片';
-            const commImages = c.commImages || c.clientImages || [];
+            const commImages = getCommClientImages(c);
             return `
                 ${renderSummaryStripSection('沟通图片', uploadSummary, commImages, '', { projectId, mediaKey: 'clientImages', sectionLabel: '沟通图片' })}
                 ${renderClientFeedbackSection(c, projectId)}
@@ -10647,6 +10881,31 @@
 
         function initProjectShellInteractions() {
             app?.addEventListener('click', (e) => {
+                const deleteMediaBtn = e.target.closest('[data-delete-media]');
+                if (deleteMediaBtn) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const ok = removeMediaImage(
+                        deleteMediaBtn.dataset.projectId,
+                        deleteMediaBtn.dataset.mediaKey,
+                        deleteMediaBtn.dataset.imageIndex,
+                        deleteMediaBtn.dataset.categoryId || null,
+                        deleteMediaBtn.dataset.listSource || '',
+                        deleteMediaBtn.dataset.listIndex || ''
+                    );
+                    if (!ok) {
+                        showToast('删除失败', '未找到该图片');
+                        return;
+                    }
+                    persistLocalProjects();
+                    refreshProjectShell(deleteMediaBtn.dataset.projectId);
+                    if (findProjectById(deleteMediaBtn.dataset.projectId)?.showOnHomeFeatured) {
+                        loadHomeCases();
+                    }
+                    showToast('已删除图片', '本机已更新');
+                    return;
+                }
+
                 const lightboxBtn = e.target.closest('[data-lightbox]');
                 if (lightboxBtn) {
                     e.stopPropagation();
