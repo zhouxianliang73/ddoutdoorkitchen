@@ -254,7 +254,9 @@
   <div class="shell home" id="shell">
     <header class="top" id="top"></header>
     <div id="banner"></div>
-    <main class="pad" id="main"></main>
+    <main class="pad" id="main">
+      <div class="hero"><b>外贸英语跟读</b><p>正在打开… 超过 5 秒请用 Safari / Chrome，不要用微信内打开。</p></div>
+    </main>
   </div>
   <div class="player" id="player" hidden></div>
   <div class="sheet-mask" id="mask"></div>
@@ -690,19 +692,27 @@
       return sc ? sc.lines[state.lineIndex] : null;
     }
 
+    function synth() {
+      return window.speechSynthesis || null;
+    }
+
     function unlock() {
       if (state.unlocked) return;
+      const s = synth();
+      if (!s) { state.unlocked = true; return; }
       try {
         const u = new SpeechSynthesisUtterance(" ");
         u.volume = 0;
-        speechSynthesis.speak(u);
-        speechSynthesis.cancel();
+        s.speak(u);
+        s.cancel();
       } catch (e) {}
       state.unlocked = true;
     }
 
     function collectVoices() {
-      const all = speechSynthesis.getVoices() || [];
+      const s = synth();
+      if (!s) { state.noVoice = true; state.voices = []; return; }
+      const all = s.getVoices() || [];
       const en = all.filter((v) => /^en(-|_)/i.test(v.lang) || /english/i.test(v.name));
       state.voices = en.length ? en : all;
       state.noVoice = en.length === 0;
@@ -779,8 +789,10 @@
 
     function speak(text) {
       return new Promise((resolve, reject) => {
+        const s = synth();
+        if (!s) { state.noVoice = true; resolve(); return; }
         unlock();
-        speechSynthesis.cancel();
+        s.cancel();
         const u = new SpeechSynthesisUtterance(text);
         const voice = currentVoice();
         if (voice) u.voice = voice;
@@ -802,7 +814,7 @@
           if (e.error === "canceled" || e.error === "interrupted") resolve();
           else reject(e);
         };
-        speechSynthesis.speak(u);
+        s.speak(u);
       });
     }
 
@@ -814,7 +826,7 @@
     function stopAll() {
       state.abort = true;
       talkGen += 1;
-      try { speechSynthesis.cancel(); } catch (e) {}
+      try { const s = synth(); if (s) s.cancel(); } catch (e) {}
       stopRec(false);
       setPhase("idle", "");
     }
@@ -1228,7 +1240,8 @@
       state.recUrl = "";
       renderPlayer();
       refreshSceneProgress();
-      document.querySelector('.bubble[data-line="' + state.lineIndex + '"]')?.scrollIntoView({ block: "center", behavior: "smooth" });
+      var bubble = document.querySelector('.bubble[data-line="' + state.lineIndex + '"]');
+      if (bubble && bubble.scrollIntoView) bubble.scrollIntoView({ block: "center", behavior: "smooth" });
     }
 
     function openSheet() {
@@ -1284,14 +1297,30 @@
       } catch (e) {}
     }
 
-    speechSynthesis.onvoiceschanged = () => { collectVoices(); };
-    collectVoices();
-    window.addEventListener("hashchange", applyHash);
-    document.addEventListener("visibilitychange", () => { if (document.hidden) stopAll(); });
-    applyHash();
-    loadFileInbox().then(() => {
-      if (state.view === "home" || state.view === "inbox") render();
-    });
+    (function boot() {
+      try {
+        var s = synth();
+        if (s) {
+          s.onvoiceschanged = collectVoices;
+          collectVoices();
+        } else {
+          state.noVoice = true;
+        }
+        window.addEventListener("hashchange", applyHash);
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) stopAll();
+        });
+        applyHash();
+        loadFileInbox().then(function () {
+          if (state.view === "home" || state.view === "inbox") render();
+        });
+      } catch (err) {
+        var main = document.getElementById("main");
+        if (main) {
+          main.innerHTML = '<div class="hero"><b>页面没能启动</b><p>请用 Safari 或 Chrome 打开 https://ddoutdoorkitchen.com/english.html ，不要用微信内置浏览器。</p></div>';
+        }
+      }
+    })();
   </script>
 </body>
 </html>
