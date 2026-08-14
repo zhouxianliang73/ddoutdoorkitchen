@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<!-- 跟读练习页；部署时由 deploy-cloudbase-hosting 拷到站点根 /english.html -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#ececec" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>户外厨房外贸英语 · 跟读</title>
+  <style>
+    :root {
+      --bg: #ececec;
+      --card: #fff;
+      --ink: #1a1a1a;
+      --ink2: #444;
+      --muted: #888;
+      --faint: #bbb;
+      --line: #e4e4e4;
+      --me: #1a1a1a;
+      --me-fg: #fff;
+      --good: #2f6b3a;
+      --play: #c45c26;
+      --radius: 16px;
+      --font: -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      --safe-t: env(safe-area-inset-top);
+      --safe-b: env(safe-area-inset-bottom);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); }
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font-family: inherit; touch-action: manipulation; }
+
+    .shell {
+      width: min(100%, 430px);
+      min-height: 100dvh;
+      margin: 0 auto;
+      background: var(--bg);
+      padding-bottom: calc(148px + var(--safe-b));
+    }
+    .shell.home { padding-bottom: calc(24px + var(--safe-b)); }
+
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: calc(10px + var(--safe-t)) 16px 12px;
+      background: rgba(236,236,236,.92);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .top h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: -.02em;
+      flex: 1;
+    }
+    .top .sub { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    .icon-btn {
+      width: 36px; height: 36px; border: 0; border-radius: 10px;
+      background: var(--card); color: var(--ink);
+      display: grid; place-items: center; font-size: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .ghost {
+      border: 0; background: #fff; color: var(--ink2);
+      border-radius: 999px; padding: 6px 12px; font-size: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    .pad { padding: 0 16px 8px; }
+
+    .hero {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px 16px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .hero b { font-size: 20px; letter-spacing: -.03em; }
+    .hero p { margin: 8px 0 0; font-size: 13px; color: var(--ink2); line-height: 1.55; }
+    .tips { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .tips span {
+      font-size: 11px; color: var(--muted); background: #f4f4f4;
+      border-radius: 999px; padding: 4px 8px;
+    }
+
+    .scene-list { display: flex; flex-direction: column; gap: 8px; }
+    .scene-card {
+      display: flex; gap: 12px; align-items: center;
+      background: var(--card); border: 0; border-radius: 14px;
+      padding: 12px 12px 12px 14px; text-align: left; width: 100%;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      color: inherit;
+    }
+    .no {
+      width: 36px; height: 36px; border-radius: 10px; flex: none;
+      display: grid; place-items: center;
+      background: #f3f3f3; font-size: 13px; font-weight: 700;
+    }
+    .scene-card strong { display: block; font-size: 15px; }
+    .scene-card em { display: block; font-style: normal; font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .prog {
+      margin-left: auto; font-size: 11px; color: var(--muted); flex: none;
+    }
+    .prog .ok { color: var(--good); font-weight: 650; }
+
+    .sec-title {
+      margin: 18px 2px 8px; font-size: 12px; color: var(--muted); font-weight: 650;
+      letter-spacing: .06em;
+    }
+
+    .chat { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+    .row { display: flex; }
+    .row.me { justify-content: flex-end; }
+    .bubble {
+      max-width: 86%;
+      border: 0;
+      border-radius: 16px;
+      padding: 10px 12px;
+      text-align: left;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      color: inherit;
+    }
+    .row.me .bubble { background: var(--me); color: var(--me-fg); }
+    .bubble.on { outline: 2px solid var(--play); }
+    .row.me .bubble.on { outline-color: #fff; box-shadow: 0 0 0 2px var(--play); }
+    .who { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+    .row.me .who { color: rgba(255,255,255,.55); text-align: right; }
+    .en { font-size: 14px; line-height: 1.45; font-weight: 500; }
+    .zh { font-size: 12px; line-height: 1.45; margin-top: 6px; opacity: .72; }
+
+    .word-groups { display: flex; flex-direction: column; gap: 14px; }
+    .group { background: #fff; border-radius: 14px; padding: 12px; }
+    .group h3 { margin: 0 0 10px; font-size: 13px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border: 0; background: #f4f4f4; border-radius: 12px;
+      padding: 8px 10px; text-align: left;
+    }
+    .chip b { display: block; font-size: 13px; }
+    .chip i { display: block; font-style: normal; font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .chip.on { background: var(--ink); color: #fff; }
+    .chip.on i { color: rgba(255,255,255,.7); }
+
+    .word-sample {
+      margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line);
+      font-size: 13px; line-height: 1.5; color: var(--ink2);
+    }
+
+    .inbox {
+      width: 100%; min-height: 140px; border: 0; border-radius: 14px;
+      padding: 12px; font-size: 14px; line-height: 1.5; font-family: inherit;
+      background: #fff; resize: vertical; color: var(--ink);
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .field {
+      width: 100%; border: 0; border-radius: 12px; padding: 10px 12px;
+      font-size: 13px; font-family: inherit; background: #fff;
+    }
+    .cand {
+      background: #fff; border-radius: 14px; padding: 12px; margin-top: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); text-align: left; width: 100%;
+      border: 0; color: inherit;
+    }
+    .cand .tag { font-size: 10px; color: var(--muted); letter-spacing: .04em; margin-bottom: 4px; }
+    .cand .src { font-size: 11px; color: var(--muted); margin-top: 6px; }
+    .copybar {
+      margin: 0 0 10px; display: flex; gap: 8px;
+    }
+    .copybar .btn { flex: 1; height: 40px; }
+
+    .player {
+      position: fixed;
+      left: 50%; transform: translateX(-50%);
+      bottom: 0; width: min(100%, 430px);
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -8px 28px rgba(0,0,0,.08);
+      padding: 12px 16px calc(12px + var(--safe-b));
+      z-index: 30;
+    }
+    .karaoke {
+      font-size: 18px; line-height: 1.45; font-weight: 600; letter-spacing: -.02em;
+      min-height: 52px;
+    }
+    .karaoke .w { color: var(--faint); }
+    .karaoke .w.said { color: var(--ink2); }
+    .karaoke .w.now { color: var(--play); border-bottom: 2px solid var(--play); }
+    .k-zh { font-size: 12px; color: var(--muted); margin: 6px 0 10px; }
+
+    .phase {
+      height: 4px; background: #f0f0f0; border-radius: 99px; overflow: hidden; margin-bottom: 10px;
+    }
+    .phase i {
+      display: block; height: 100%; width: 0; background: var(--play); border-radius: 99px;
+    }
+    .phase-lab { font-size: 11px; color: var(--play); margin: -6px 0 8px; min-height: 16px; font-weight: 650; }
+
+    .btns { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px; }
+    .btn {
+      border: 0; border-radius: 12px; height: 44px;
+      font-size: 14px; font-weight: 650; background: #f3f3f3; color: var(--ink);
+    }
+    .btn.primary { background: var(--ink); color: #fff; }
+    .btn.warn { background: #fff1e8; color: var(--play); }
+    .btn:disabled { opacity: .45; }
+    .nav-line {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 8px; font-size: 12px; color: var(--muted);
+    }
+    .nav-line button { border: 0; background: none; color: var(--ink); font-size: 13px; font-weight: 650; padding: 6px; }
+    .rates { display: flex; gap: 6px; margin-top: 8px; }
+    .rates button, .acc button {
+      border: 0; background: #f3f3f3; border-radius: 999px;
+      font-size: 11px; padding: 5px 9px; color: var(--muted);
+    }
+    .rates button.on, .acc button.on { background: var(--ink); color: #fff; }
+    .acc { display: flex; gap: 6px; margin-left: auto; }
+
+    .banner {
+      margin: 0 16px 10px; padding: 10px 12px; border-radius: 12px;
+      background: #fff7e8; color: #7a4a12; font-size: 12px; line-height: 1.45;
+    }
+    .empty { color: var(--muted); font-size: 13px; padding: 20px 4px; }
+
+    .sheet-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.28); z-index: 40;
+      display: none;
+    }
+    .sheet-mask.show { display: block; }
+    .sheet {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: 0; width: min(100%, 430px);
+      background: #fff; border-radius: 20px 20px 0 0; z-index: 41;
+      padding: 16px 16px calc(18px + var(--safe-b));
+    }
+    .sheet h2 { margin: 0 0 12px; font-size: 16px; }
+    .voice { width: 100%; margin: 8px 0 12px; font-size: 13px; padding: 8px; border-radius: 10px; border: 1px solid var(--line); }
+    .hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="shell home" id="shell">
+    <header class="top" id="top"></header>
+    <div id="banner"></div>
+    <main class="pad" id="main"></main>
+  </div>
+  <div class="player" id="player" hidden></div>
+  <div class="sheet-mask" id="mask"></div>
+  <div id="sheetHost"></div>
+
+  <script>
+    const STORE = "dd-en-drill-v1";
+    const BANK = "dd-en-mine-v1";
+    const SEEN = "dd-en-inbox-seen-v1";
+    const SCENES = [
+      {
+        id: "inquiry",
+        title: "阿里首回",
+        goal: "30 秒说清我们是谁、做什么柜",
+        lines: [
+          { role: "them", en: "Hi, we are a distributor in France. Do you make outdoor kitchen cabinets in stainless steel?", zh: "你好，我们是法国经销商。你们做不锈钢户外厨房柜吗？" },
+          { role: "me", en: "Yes. We manufacture modular stainless outdoor kitchens — Mini, Pro and Ultra.", zh: "做。我们生产模块化不锈钢户外厨房，有 Mini / Pro / Ultra。" },
+          { role: "me", en: "Could you share the layout or the total width you need?", zh: "方便发一下布局，或者你需要的总宽度吗？" },
+          { role: "me", en: "I can send a 3200 Ultra as a reference if that helps.", zh: "需要的话我可以先发一个 3200 Ultra 作参考。" },
+          { role: "me", en: "WhatsApp is fine. I will send photos and the spec in one message.", zh: "用 WhatsApp 就行。照片和规格我放在一条消息里发你。" }
+        ]
+      },
+      {
+        id: "product",
+        title: "产品介绍",
+        goal: "讲清 304、模块、可移动、不含电器",
+        lines: [
+          { role: "me", en: "The carcass is 304 stainless steel. This is a mobile outdoor kitchen island.", zh: "柜体是 304 不锈钢。这是可移动的户外厨房岛台。" },
+          { role: "me", en: "Ultra is the opening-door version. Pro is mid-range. Mini is the compact unit.", zh: "Ultra 是开门款，Pro 是中间档，Mini 是紧凑款。" },
+          { role: "me", en: "Cabinets only. BBQ, sink and fridge are not included unless you ask.", zh: "默认只含柜体。烧烤炉、水槽、冰箱除非你要，否则不含。" },
+          { role: "me", en: "The unit sits on casters, so it can move on the terrace.", zh: "底下有万向轮，可以在露台上移动。" },
+          { role: "them", en: "Is it for indoor kitchens as well?", zh: "室内厨房也能用吗？" },
+          { role: "me", en: "It is built for outdoor use. Indoor is possible, but this line is for terraces and gardens.", zh: "按户外做的。室内也能放，但这条产品线是给露台和花园的。" }
+        ]
+      },
+      {
+        id: "specs",
+        title: "规格确认",
+        goal: "宽深高、门抽、台面、设备开口一次说清",
+        lines: [
+          { role: "them", en: "What are the standard dimensions?", zh: "标准尺寸是多少？" },
+          { role: "me", en: "Standard depth is 650 mm. Height is 914 mm including the countertop.", zh: "标准深 650 毫米，含台面高 914 毫米。" },
+          { role: "me", en: "Drawer units come in 400, 600 and 800 mm. The filler cabinet can be adjusted.", zh: "抽屉柜有 400 / 600 / 800。补缝的标准柜可以调宽。" },
+          { role: "me", en: "Appliance cabinets are fixed width. We don't cut those on site.", zh: "设备柜宽度是锁死的，现场不改切。" },
+          { role: "me", en: "Panel thickness is 18 mm. Door gap is 2 mm.", zh: "板厚 18 毫米，门缝 2 毫米。" }
+        ]
+      },
+      {
+        id: "quote",
+        title: "报价",
+        goal: "EXW、含什么、有效期、把球踢回去",
+        lines: [
+          { role: "them", en: "Please send your best price for two Ultra 3200.", zh: "请报两个 Ultra 3200 的最好价格。" },
+          { role: "me", en: "This is EXW, cabinets only. Appliances are not included.", zh: "这是 EXW 价，只含柜体，不含电器。" },
+          { role: "me", en: "The quote is valid for 15 days. I can lock the price after deposit.", zh: "报价有效 15 天。定金下来后可以锁价。" },
+          { role: "me", en: "Shall I quote the 3200 Ultra layout first?", zh: "要不要我先按 3200 Ultra 的布局出一份价？" },
+          { role: "me", en: "Two islands, same spec. I will send the PI this afternoon.", zh: "两台岛台，同一规格。今天下午发形式发票给你。" }
+        ]
+      },
+      {
+        id: "rust",
+        title: "会不会锈",
+        goal: "304 / 316 / 海边 / 粉末喷涂",
+        lines: [
+          { role: "them", en: "Will it rust in the rain? We install near the sea sometimes.", zh: "下雨会锈吗？我们有时装在海边。" },
+          { role: "me", en: "304 is suitable for most outdoor use, including rain.", zh: "304 适合大多数户外，包括淋雨。" },
+          { role: "me", en: "For coastal or salt air, we recommend 316 stainless.", zh: "海边或盐雾环境，建议用 316 不锈钢。" },
+          { role: "me", en: "We can also powder-coat the doors if you need a color.", zh: "门板需要颜色的话，也可以做粉末喷涂。" },
+          { role: "me", en: "Keep it clean and avoid standing water in the drawers.", zh: "保持清洁，抽屉里不要积水。" }
+        ]
+      },
+      {
+        id: "lead",
+        title: "交期与包装",
+        goal: "样品、大货、木箱、装柜照片",
+        lines: [
+          { role: "them", en: "How long for a sample and for bulk?", zh: "样品和大货各要多久？" },
+          { role: "me", en: "Sample takes 15 to 20 days. Bulk is 30 to 40 days after deposit.", zh: "样品 15 到 20 天。大货定金后 30 到 40 天。" },
+          { role: "me", en: "We pack in export wooden crates, one island per crate if needed.", zh: "出口木箱包装，需要的话一台岛台一箱。" },
+          { role: "me", en: "I will send loading photos before the truck leaves.", zh: "装车走之前我会发装柜照片。" },
+          { role: "me", en: "Sea freight to France is usually 30 to 35 days, plus customs.", zh: "海运到法国一般 30 到 35 天，再加清关。" }
+        ]
+      },
+      {
+        id: "custom",
+        title: "改单非标",
+        goal: "能改补缝柜，改框架要加交期",
+        lines: [
+          { role: "them", en: "Can you make it 3350 mm instead of 3200?", zh: "能不能做成 3350，而不是 3200？" },
+          { role: "me", en: "We can adjust the filler cabinet width to match 3350.", zh: "可以用标准柜调宽，对上 3350。" },
+          { role: "me", en: "Changing the frame or the door type needs extra lead time.", zh: "改框架或门型要额外加交期。" },
+          { role: "me", en: "If we change the BBQ cutout, please send the appliance drawing.", zh: "如果要改烧烤炉开孔，请发电器图纸。" },
+          { role: "me", en: "This change does not affect the price. I will update the layout today.", zh: "这次改动不影响价格。我今天更新布局给你。" }
+        ]
+      },
+      {
+        id: "ship",
+        title: "定金与出货",
+        goal: "定金、尾款、提单、照片",
+        lines: [
+          { role: "me", en: "30% deposit to start production. Balance before shipment.", zh: "30% 定金开工，尾款出货前付清。" },
+          { role: "me", en: "Production is finished. I will send photos and the packing list.", zh: "货做好了。我发照片和装箱单。" },
+          { role: "me", en: "Please arrange the balance so we can book the pickup.", zh: "请安排尾款，我们好预约提货。" },
+          { role: "me", en: "The BL draft will follow after the vessel is confirmed.", zh: "船期确认后发提单草本。" },
+          { role: "me", en: "Spare hinges and extra touch-up paint are in the crate.", zh: "备用铰链和补漆在木箱里。" }
+        ]
+      }
+    ];
+
+    const WORDS = [
+      { g: "产品", items: [
+        { en: "outdoor kitchen", zh: "户外厨房" },
+        { en: "island", zh: "岛台" },
+        { en: "modular", zh: "模块化" },
+        { en: "carcass", zh: "柜体（箱体）" },
+        { en: "drawer unit", zh: "抽屉柜" },
+        { en: "filler cabinet", zh: "补缝标准柜" },
+        { en: "countertop", zh: "台面" },
+        { en: "casters", zh: "万向轮" },
+        { en: "cutout", zh: "开孔" },
+        { en: "layout", zh: "布局" }
+      ]},
+      { g: "材质工艺", items: [
+        { en: "304 stainless", zh: "304 不锈钢" },
+        { en: "316 stainless", zh: "316 不锈钢" },
+        { en: "powder-coat", zh: "粉末喷涂" },
+        { en: "weather-resistant", zh: "耐候" },
+        { en: "salt air", zh: "盐雾 / 海风" },
+        { en: "panel thickness", zh: "板厚" },
+        { en: "welded frame", zh: "焊接框架" }
+      ]},
+      { g: "交易出货", items: [
+        { en: "distributor", zh: "经销商" },
+        { en: "EXW", zh: "工厂交货价" },
+        { en: "FOB", zh: "离岸价" },
+        { en: "lead time", zh: "交期" },
+        { en: "deposit", zh: "定金" },
+        { en: "balance", zh: "尾款" },
+        { en: "PI", zh: "形式发票" },
+        { en: "packing list", zh: "装箱单" },
+        { en: "wooden crate", zh: "出口木箱" },
+        { en: "BL draft", zh: "提单草本" }
+      ]}
+    ];
+
+    const GLOSSARY = [
+      { keys: ["柜体", "carcass"], word: { en: "carcass", zh: "柜体" }, line: { en: "The carcass is 304 stainless steel.", zh: "柜体是 304 不锈钢。" } },
+      { keys: ["304", "不锈钢"], word: { en: "304 stainless", zh: "304 不锈钢" }, line: { en: "304 is suitable for most outdoor use, including rain.", zh: "304 适合大多数户外，包括淋雨。" } },
+      { keys: ["316", "海边", "盐雾", "coastal", "salt air"], word: { en: "316 stainless", zh: "316 不锈钢" }, line: { en: "For coastal or salt air, we recommend 316 stainless.", zh: "海边或盐雾环境，建议用 316 不锈钢。" } },
+      { keys: ["模块", "modular"], word: { en: "modular", zh: "模块化" }, line: { en: "We manufacture modular stainless outdoor kitchens.", zh: "我们生产模块化不锈钢户外厨房。" } },
+      { keys: ["岛台", "island"], word: { en: "island", zh: "岛台" }, line: { en: "This is a mobile outdoor kitchen island.", zh: "这是可移动的户外厨房岛台。" } },
+      { keys: ["万向轮", "casters", "可移动", "mobile"], word: { en: "casters", zh: "万向轮" }, line: { en: "The unit sits on casters, so it can move on the terrace.", zh: "底下有万向轮，可以在露台上移动。" } },
+      { keys: ["抽屉柜", "drawer"], word: { en: "drawer unit", zh: "抽屉柜" }, line: { en: "Drawer units come in 400, 600 and 800 mm.", zh: "抽屉柜有 400 / 600 / 800。" } },
+      { keys: ["标准柜", "补缝", "filler"], word: { en: "filler cabinet", zh: "补缝标准柜" }, line: { en: "We can adjust the filler cabinet width to match the run.", zh: "可以用标准柜调宽，把总长补齐。" } },
+      { keys: ["台面", "countertop"], word: { en: "countertop", zh: "台面" }, line: { en: "Height is 914 mm including the countertop.", zh: "含台面高 914 毫米。" } },
+      { keys: ["开孔", "cutout", "烧烤炉", "BBQ"], word: { en: "cutout", zh: "开孔" }, line: { en: "If we change the BBQ cutout, please send the appliance drawing.", zh: "如果要改烧烤炉开孔，请发电器图纸。" } },
+      { keys: ["布局", "layout"], word: { en: "layout", zh: "布局" }, line: { en: "Could you share the layout or the total width you need?", zh: "方便发一下布局，或总宽度吗？" } },
+      { keys: ["不含电器", "只含柜", "cabinets only"], word: { en: "cabinets only", zh: "只含柜体" }, line: { en: "This is EXW, cabinets only. Appliances are not included.", zh: "EXW 价，只含柜体，不含电器。" } },
+      { keys: ["粉末喷涂", "powder"], word: { en: "powder-coat", zh: "粉末喷涂" }, line: { en: "We can powder-coat the doors if you need a color.", zh: "门板需要颜色的话，可以做粉末喷涂。" } },
+      { keys: ["经销商", "distributor"], word: { en: "distributor", zh: "经销商" }, line: { en: "We work with distributors. I can send a dealer pack.", zh: "我们和经销商合作。我可以发一套经销资料。" } },
+      { keys: ["EXW", "出厂价", "工厂交货"], word: { en: "EXW", zh: "工厂交货价" }, line: { en: "This is EXW, cabinets only.", zh: "这是 EXW 价，只含柜体。" } },
+      { keys: ["FOB"], word: { en: "FOB", zh: "离岸价" }, line: { en: "I can also quote FOB if you need freight included to the port.", zh: "需要的话也可以报 FOB，含到港前运费。" } },
+      { keys: ["交期", "lead time"], word: { en: "lead time", zh: "交期" }, line: { en: "Sample takes 15 to 20 days. Bulk is 30 to 40 days after deposit.", zh: "样品 15 到 20 天。大货定金后 30 到 40 天。" } },
+      { keys: ["样品", "sample"], word: { en: "sample", zh: "样品" }, line: { en: "Sample takes 15 to 20 days.", zh: "样品 15 到 20 天。" } },
+      { keys: ["大货", "bulk"], word: { en: "bulk", zh: "大货" }, line: { en: "Bulk is 30 to 40 days after deposit.", zh: "大货定金后 30 到 40 天。" } },
+      { keys: ["定金", "deposit"], word: { en: "deposit", zh: "定金" }, line: { en: "30% deposit to start production. Balance before shipment.", zh: "30% 定金开工，尾款出货前付清。" } },
+      { keys: ["尾款", "balance"], word: { en: "balance", zh: "尾款" }, line: { en: "Please arrange the balance so we can book the pickup.", zh: "请安排尾款，我们好预约提货。" } },
+      { keys: ["形式发票", "PI"], word: { en: "PI", zh: "形式发票" }, line: { en: "I will send the PI this afternoon.", zh: "今天下午发形式发票给你。" } },
+      { keys: ["装箱单", "packing list"], word: { en: "packing list", zh: "装箱单" }, line: { en: "I will send photos and the packing list.", zh: "我发照片和装箱单。" } },
+      { keys: ["木箱", "crate"], word: { en: "wooden crate", zh: "出口木箱" }, line: { en: "We pack in export wooden crates.", zh: "出口木箱包装。" } },
+      { keys: ["提单", "BL"], word: { en: "BL draft", zh: "提单草本" }, line: { en: "The BL draft will follow after the vessel is confirmed.", zh: "船期确认后发提单草本。" } },
+      { keys: ["装柜照片", "loading photos"], word: { en: "loading photos", zh: "装柜照片" }, line: { en: "I will send loading photos before the truck leaves.", zh: "装车走之前我会发装柜照片。" } },
+      { keys: ["Ultra"], word: { en: "Ultra", zh: "Ultra 开门款" }, line: { en: "Ultra is the opening-door version.", zh: "Ultra 是开门款。" } },
+      { keys: ["Mini"], word: { en: "Mini", zh: "Mini 紧凑款" }, line: { en: "Mini is the compact unit.", zh: "Mini 是紧凑款。" } },
+      { keys: ["Pro"], word: { en: "Pro", zh: "Pro 中间档" }, line: { en: "Pro is the mid-range version.", zh: "Pro 是中间档。" } },
+      { keys: ["生锈", "会锈", "rust"], word: { en: "rust", zh: "生锈" }, line: { en: "304 is suitable for most outdoor use, including rain.", zh: "304 适合大多数户外，包括淋雨。" } },
+      { keys: ["改单", "非标", "custom"], word: { en: "custom width", zh: "非标改宽" }, line: { en: "Changing the frame or the door type needs extra lead time.", zh: "改框架或门型要额外加交期。" } }
+    ];
+
+    const state = {
+      view: "home",
+      sceneId: null,
+      lineIndex: 0,
+      rate: 0.85,
+      accent: "us",
+      phase: "idle",
+      label: "",
+      unlocked: false,
+      voiceURI: "",
+      voices: [],
+      practiced: loadProgress(),
+      abort: false,
+      lastMs: 1800,
+      recording: false,
+      recUrl: "",
+      wordKey: "",
+      noVoice: false,
+      mine: loadMine(),
+      candidates: [],
+      inboxText: "",
+      fileInbox: [],
+      seenInbox: loadSeenInbox(),
+      activeInqId: ""
+    };
+
+    let recChunks = [];
+    let mediaRec = null;
+    let recStream = null;
+    let talkGen = 0;
+
+    function loadProgress() {
+      try { return JSON.parse(localStorage.getItem(STORE) || "{}"); }
+      catch (e) { return {}; }
+    }
+    function loadMine() {
+      try {
+        const o = JSON.parse(localStorage.getItem(BANK) || "{}");
+        return { lines: Array.isArray(o.lines) ? o.lines : [], words: Array.isArray(o.words) ? o.words : [] };
+      } catch (e) { return { lines: [], words: [] }; }
+    }
+    function loadSeenInbox() {
+      try { return JSON.parse(localStorage.getItem(SEEN) || "{}"); }
+      catch (e) { return {}; }
+    }
+    function saveSeenInbox() {
+      localStorage.setItem(SEEN, JSON.stringify(state.seenInbox));
+    }
+    function unreadInquiries() {
+      return (state.fileInbox || []).filter((q) => q && q.id && !state.seenInbox[q.id]);
+    }
+    function saveMine() {
+      localStorage.setItem(BANK, JSON.stringify(state.mine));
+    }
+    function allScenes() {
+      if (!state.mine.lines.length) return SCENES;
+      return [{
+        id: "mine",
+        title: "今日询盘回复",
+        goal: "先跟读客户原话，再跟读你要发出去的回复",
+        lines: state.mine.lines
+      }].concat(SCENES);
+    }
+    function allWords() {
+      if (!state.mine.words.length) return WORDS;
+      return [{ g: "今日 / 我的词", items: state.mine.words }].concat(WORDS);
+    }
+    function scene() { return allScenes().find((s) => s.id === state.sceneId); }
+
+    function isEnglishLine(s) {
+      const letters = (s.match(/[A-Za-z]/g) || []).length;
+      const hans = (s.match(/[\u4e00-\u9fff]/g) || []).length;
+      return letters >= 12 && letters > hans * 2 && s.trim().split(/\s+/).length >= 4;
+    }
+    function lineKey(en, zh) {
+      return String(en || "").trim().toLowerCase() + "|" + String(zh || "").trim();
+    }
+    function knownLineKeys() {
+      const s = new Set();
+      allScenes().forEach((sc) => sc.lines.forEach((l) => s.add(lineKey(l.en, l.zh))));
+      (state.candidates || []).forEach((c) => { if (c.kind === "line") s.add(lineKey(c.en, c.zh)); });
+      return s;
+    }
+    function knownWords() {
+      const s = new Set();
+      allWords().forEach((g) => g.items.forEach((w) => s.add(w.en.toLowerCase())));
+      (state.candidates || []).forEach((c) => { if (c.kind === "word") s.add(c.en.toLowerCase()); });
+      return s;
+    }
+    function glossaryHit(chunk, g) {
+      const low = chunk.toLowerCase();
+      return g.keys.some((k) => {
+        if (/^[A-Za-z]{1,4}$/.test(k)) {
+          return new RegExp("(?:^|[^A-Za-z])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?:[^A-Za-z]|$)", "i").test(chunk);
+        }
+        return low.includes(k.toLowerCase());
+      });
+    }
+    function harvest(raw) {
+      const chunks = String(raw || "").replace(/\r/g, "").split(/\n+/).map((s) => s.trim())
+        .filter((s) => s && !s.startsWith("#") && s.length > 2);
+      const lines = [];
+      const words = [];
+      const seenL = knownLineKeys();
+      const seenW = knownWords();
+      function addLine(en, zh, src) {
+        en = String(en || "").replace(/\s+/g, " ").trim();
+        zh = String(zh || "").trim();
+        if (en.split(/\s+/).length < 3) return;
+        const k = lineKey(en, zh);
+        if (seenL.has(k)) return;
+        seenL.add(k);
+        lines.push({ kind: "line", role: "me", en: en, zh: zh || "今日工作", src: src || "" });
+      }
+      function addWord(en, zh) {
+        en = String(en || "").trim();
+        if (!en || seenW.has(en.toLowerCase())) return;
+        seenW.add(en.toLowerCase());
+        words.push({ kind: "word", en: en, zh: String(zh || "").trim() });
+      }
+      for (const chunk of chunks) {
+        if (isEnglishLine(chunk)) addLine(chunk, "今日工作原文", chunk);
+        let best = null;
+        let bestLen = 0;
+        for (const g of GLOSSARY) {
+          if (!glossaryHit(chunk, g)) continue;
+          addWord(g.word.en, g.word.zh);
+          const len = g.keys.reduce((n, k) => Math.max(n, glossaryHit(chunk, { keys: [k] }) ? k.length : 0), 0);
+          if (len >= bestLen) { best = g; bestLen = len; }
+        }
+        if (best && !isEnglishLine(chunk)) addLine(best.line.en, best.line.zh, chunk);
+        if (!isEnglishLine(chunk)) {
+          const dm = chunk.match(/(\d{3,4})\s*(mm|毫米)/i) || (/(宽|总长|做成|改成)/.test(chunk) && chunk.match(/\b(2200|2900|3200|3350|3500)\b/));
+          if (dm && /(宽|长|总|width|layout|Ultra|Mini|Pro|做成|改成|毫米|mm)/i.test(chunk)) {
+            addLine("We can do " + dm[1] + " mm total width.", "总宽可以做成 " + dm[1] + " 毫米。", chunk);
+            addWord(dm[1] + " mm", dm[1] + " 毫米");
+          }
+        }
+        const dep = chunk.match(/定金\s*(\d+)\s*%/) || chunk.match(/(\d+)\s*%\s*deposit/i);
+        if (dep) addLine(dep[1] + "% deposit to start production. Balance before shipment.", dep[1] + "% 定金开工，尾款出货前付清。", chunk);
+      }
+      return { lines: lines, words: words };
+    }
+    function hasAny(text, keys) {
+      const t = String(text || "").toLowerCase();
+      return keys.some((k) => t.includes(String(k).toLowerCase()));
+    }
+    function buildReplyPack(raw) {
+      const text = String(raw || "");
+      const pack = [];
+      const seen = new Set();
+      function push(en, zh) {
+        if (seen.has(en)) return;
+        seen.add(en);
+        pack.push({ kind: "line", role: "me", en: en, zh: zh, src: "回复稿", pack: true });
+      }
+      push(
+        "Thanks for your inquiry. We manufacture modular stainless outdoor kitchens — Mini, Pro and Ultra.",
+        "谢谢询盘。我们做模块化不锈钢户外厨房，有 Mini / Pro / Ultra。"
+      );
+      if (hasAny(text, ["rust", "锈", "sea", "coast", "盐", "316", "304", "stainless", "不锈钢"])) {
+        if (hasAny(text, ["sea", "coast", "盐", "海边", "316"])) {
+          push("For coastal or salt air, we recommend 316 stainless.", "海边或盐雾环境，建议用 316 不锈钢。");
+        } else {
+          push("The carcass is 304 stainless steel. 304 is suitable for most outdoor use, including rain.", "柜体是 304 不锈钢，适合大多数户外包括淋雨。");
+        }
+      }
+      if (hasAny(text, ["price", "quote", "报价", "多少钱", "exw", "fob", "best price", "cif"])) {
+        push("This is EXW, cabinets only. Appliances are not included.", "这是 EXW 价，只含柜体，不含电器。");
+        push("The quote is valid for 15 days. I can lock the price after deposit.", "报价有效 15 天。定金下来后可以锁价。");
+      }
+      const dm = text.match(/\b(2200|2900|3200|3350|3500|400|600|800)\b/) || text.match(/(\d{3,4})\s*(mm|毫米)/i);
+      if (hasAny(text, ["3200", "2900", "2200", "3500", "ultra", "mini", "pro", "width", "size", "dimension", "尺寸", "宽", "layout", "布局"])) {
+        if (dm) {
+          push("We can do " + dm[1] + " mm. Standard depth is 650 mm, height 914 mm including the countertop.", "可以做 " + dm[1] + " 毫米。标准深 650，含台面高 914。");
+        } else {
+          push("Standard depth is 650 mm. Height is 914 mm including the countertop.", "标准深 650 毫米，含台面高 914 毫米。");
+        }
+        if (hasAny(text, ["ultra", "mini", "pro"])) {
+          push("Ultra is the opening-door version. Pro is mid-range. Mini is the compact unit.", "Ultra 开门款，Pro 中间档，Mini 紧凑款。");
+        }
+      }
+      if (hasAny(text, ["lead", "delivery", "交期", "几天", "how long", "sample", "样品", "bulk", "大货"])) {
+        push("Sample takes 15 to 20 days. Bulk is 30 to 40 days after deposit.", "样品 15 到 20 天。大货定金后 30 到 40 天。");
+      }
+      if (hasAny(text, ["deposit", "定金", "payment", "付款", "30%"])) {
+        push("30% deposit to start production. Balance before shipment.", "30% 定金开工，尾款出货前付清。");
+      }
+      if (hasAny(text, ["custom", "non-standard", "非标", "改单", "instead of"])) {
+        push("We can adjust the filler cabinet width. Changing the frame needs extra lead time.", "可以用标准柜调宽。改框架要加交期。");
+      }
+      if (hasAny(text, ["bbq", "fridge", "sink", "appliance", "电器", "烧烤", "冰箱", "水槽"])) {
+        push("Cabinets only. BBQ, sink and fridge are not included unless you ask.", "默认只含柜体。烧烤炉、水槽、冰箱除非你要否则不含。");
+      }
+      if (hasAny(text, ["crate", "pack", "木箱", "包装"])) {
+        push("We pack in export wooden crates. I will send loading photos before the truck leaves.", "出口木箱包装。装车前发装柜照片。");
+      }
+      push("Could you share the layout or the total width you need? WhatsApp is fine.", "方便发布局或总宽吗？WhatsApp 即可。");
+      return pack;
+    }
+    function buildInquiryDrill(raw) {
+      const buyer = [];
+      String(raw || "").replace(/\r/g, "").split(/\n+/).forEach((chunk) => {
+        chunk = chunk.trim();
+        if (isEnglishLine(chunk)) {
+          buyer.push({ kind: "line", role: "them", en: chunk.replace(/\s+/g, " "), zh: "客户原文", src: chunk });
+        }
+      });
+      const extra = harvest(raw);
+      return { lines: buyer.concat(buildReplyPack(raw)), words: extra.words };
+    }
+    function addCandidates(list) {
+      const newLines = [];
+      const newWords = [];
+      list.forEach((item) => {
+        if (item.kind === "line") {
+          if (state.mine.lines.some((l) => lineKey(l.en, l.zh) === lineKey(item.en, item.zh))) return;
+          if (newLines.some((l) => lineKey(l.en, l.zh) === lineKey(item.en, item.zh))) return;
+          newLines.push({ role: item.role || "me", en: item.en, zh: item.zh });
+        } else {
+          if (state.mine.words.some((w) => w.en.toLowerCase() === item.en.toLowerCase())) return;
+          if (newWords.some((w) => w.en.toLowerCase() === item.en.toLowerCase())) return;
+          newWords.push({ en: item.en, zh: item.zh });
+        }
+      });
+      state.mine.lines = newLines.concat(state.mine.lines);
+      state.mine.words = newWords.concat(state.mine.words);
+      saveMine();
+    }
+    function removeMineLine(i) {
+      state.mine.lines.splice(i, 1);
+      saveMine();
+      if (!state.mine.lines.length) go("home");
+      else {
+        if (state.lineIndex >= state.mine.lines.length) state.lineIndex = Math.max(0, state.mine.lines.length - 1);
+        render();
+      }
+    }
+    function saveProgress() {
+      localStorage.setItem(STORE, JSON.stringify(state.practiced));
+    }
+    function keyOf(sceneId, i) { return sceneId + ":" + i; }
+    function isDone(sceneId, i) { return !!state.practiced[keyOf(sceneId, i)]; }
+    function markDone(sceneId, i) {
+      state.practiced[keyOf(sceneId, i)] = 1;
+      saveProgress();
+    }
+    function sceneDone(sc) {
+      return sc.lines.filter((_, i) => isDone(sc.id, i)).length;
+    }
+
+    function line() {
+      const sc = scene();
+      return sc ? sc.lines[state.lineIndex] : null;
+    }
+
+    function unlock() {
+      if (state.unlocked) return;
+      try {
+        const u = new SpeechSynthesisUtterance(" ");
+        u.volume = 0;
+        speechSynthesis.speak(u);
+        speechSynthesis.cancel();
+      } catch (e) {}
+      state.unlocked = true;
+    }
+
+    function collectVoices() {
+      const all = speechSynthesis.getVoices() || [];
+      const en = all.filter((v) => /^en(-|_)/i.test(v.lang) || /english/i.test(v.name));
+      state.voices = en.length ? en : all;
+      state.noVoice = en.length === 0;
+      if (!state.voiceURI && state.voices.length) {
+        const prefer = pickVoice();
+        state.voiceURI = prefer ? prefer.voiceURI : state.voices[0].voiceURI;
+      }
+    }
+
+    function pickVoice() {
+      const want = state.accent === "uk" ? /en-GB|en_GB|UK|British/i : /en-US|en_US|US|American/i;
+      const list = state.voices;
+      const scored = list.map((v) => {
+        let n = 0;
+        if (want.test(v.lang) || want.test(v.name)) n += 5;
+        if (/Google|Samantha|Aria|Jenny|Guy|Neural|Enhanced/i.test(v.name)) n += 3;
+        if (v.localService) n += 1;
+        return { v, n };
+      }).sort((a, b) => b.n - a.n);
+      return scored[0] && scored[0].n > 0 ? scored[0].v : list[0];
+    }
+
+    function currentVoice() {
+      return state.voices.find((v) => v.voiceURI === state.voiceURI) || pickVoice();
+    }
+
+    function tokenize(text) {
+      return text.split(/(\s+)/);
+    }
+
+    function karaokeHtml(text, hi) {
+      let wi = -1;
+      return tokenize(text).map((tok) => {
+        if (!tok.trim()) return tok;
+        wi += 1;
+        const cls = hi < 0 ? "w" : wi < hi ? "w said" : wi === hi ? "w now" : "w";
+        return '<span class="' + cls + '">' + escapeHtml(tok) + "</span>";
+      }).join("");
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    function wordIndexFromChar(text, charIndex) {
+      const head = text.slice(0, charIndex);
+      const n = head.trim().length ? head.trim().split(/\s+/).length - 1 : 0;
+      const atSpace = /\s/.test(text[charIndex] || "");
+      return atSpace ? n + 1 : n;
+    }
+
+    function setPhase(phase, label) {
+      state.phase = phase;
+      state.label = label || "";
+      const lab = document.getElementById("phaseLab");
+      const bar = document.getElementById("phaseBar");
+      if (lab) lab.textContent = state.label;
+      if (bar && phase === "idle") {
+        bar.style.transition = "none";
+        bar.style.width = "0%";
+      }
+    }
+
+    function runBar(ms) {
+      const bar = document.getElementById("phaseBar");
+      if (!bar) return;
+      bar.style.transition = "none";
+      bar.style.width = "0%";
+      requestAnimationFrame(() => {
+        bar.style.transition = "width " + ms + "ms linear";
+        bar.style.width = "100%";
+      });
+    }
+
+    function speak(text) {
+      return new Promise((resolve, reject) => {
+        unlock();
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        const voice = currentVoice();
+        if (voice) u.voice = voice;
+        u.lang = state.accent === "uk" ? "en-GB" : "en-US";
+        u.rate = state.rate;
+        u.pitch = 1;
+        const t0 = Date.now();
+        paintKaraoke(text, -1);
+        u.onboundary = (ev) => {
+          if (ev.name && ev.name !== "word") return;
+          paintKaraoke(text, wordIndexFromChar(text, ev.charIndex || 0));
+        };
+        u.onend = () => {
+          state.lastMs = Math.max(900, Date.now() - t0);
+          paintKaraoke(text, 99);
+          resolve();
+        };
+        u.onerror = (e) => {
+          if (e.error === "canceled" || e.error === "interrupted") resolve();
+          else reject(e);
+        };
+        speechSynthesis.speak(u);
+      });
+    }
+
+    function paintKaraoke(text, hi) {
+      const el = document.getElementById("karaoke");
+      if (el) el.innerHTML = karaokeHtml(text, hi);
+    }
+
+    function stopAll() {
+      state.abort = true;
+      talkGen += 1;
+      try { speechSynthesis.cancel(); } catch (e) {}
+      stopRec(false);
+      setPhase("idle", "");
+    }
+
+    async function playListen() {
+      const ln = line();
+      if (!ln) return;
+      const my = ++talkGen;
+      state.abort = false;
+      setPhase("speak", "听示范");
+      runBar(Math.round(ln.en.split(/\s+/).length * 420 / state.rate));
+      try { await speak(ln.en); } catch (e) {}
+      if (my !== talkGen) return;
+      markDone(state.sceneId, state.lineIndex);
+      setPhase("idle", "");
+      renderPlayer();
+      refreshSceneProgress();
+    }
+
+    async function playShadow() {
+      const ln = line();
+      if (!ln) return;
+      const my = ++talkGen;
+      state.abort = false;
+      setPhase("speak", "1 / 3  听示范");
+      runBar(Math.round(ln.en.split(/\s+/).length * 420 / state.rate));
+      try { await speak(ln.en); } catch (e) {}
+      if (my !== talkGen) return;
+      const wait = Math.round(state.lastMs * 1.3);
+      setPhase("wait", "2 / 3  请大声跟读");
+      runBar(wait);
+      await sleep(wait);
+      if (my !== talkGen) return;
+      setPhase("speak", "3 / 3  对照再听");
+      runBar(Math.round(state.lastMs));
+      try { await speak(ln.en); } catch (e) {}
+      if (my !== talkGen) return;
+      markDone(state.sceneId, state.lineIndex);
+      setPhase("idle", "本句完成，点下一句");
+      renderPlayer();
+      refreshSceneProgress();
+    }
+
+    function sleep(ms) {
+      return new Promise((r) => setTimeout(r, ms));
+    }
+
+    async function toggleRecord() {
+      if (state.recording) {
+        stopRec(true);
+        return;
+      }
+      unlock();
+      try {
+        recStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (e) {
+        setPhase("idle", "麦克风不可用，用「跟读」即可");
+        renderPlayer();
+        return;
+      }
+      const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((t) => MediaRecorder.isTypeSupported(t)) || "";
+      recChunks = [];
+      mediaRec = new MediaRecorder(recStream, mime ? { mimeType: mime } : undefined);
+      mediaRec.ondataavailable = (e) => { if (e.data.size) recChunks.push(e.data); };
+      mediaRec.onstop = () => {
+        if (recChunks.length) {
+          if (state.recUrl) URL.revokeObjectURL(state.recUrl);
+          state.recUrl = URL.createObjectURL(new Blob(recChunks, { type: mediaRec.mimeType || "audio/webm" }));
+        }
+        renderPlayer();
+      };
+      mediaRec.start();
+      state.recording = true;
+      setPhase("wait", "正在录音，再说一遍");
+      runBar(Math.max(2500, state.lastMs * 1.4));
+      renderPlayer();
+    }
+
+    function stopRec(playAfter) {
+      state.recording = false;
+      try { if (mediaRec && mediaRec.state !== "inactive") mediaRec.stop(); } catch (e) {}
+      try { if (recStream) recStream.getTracks().forEach((t) => t.stop()); } catch (e) {}
+      recStream = null;
+      if (playAfter) setPhase("idle", "点「我的录音」对比");
+    }
+
+    function playMine() {
+      if (!state.recUrl) return;
+      const a = new Audio(state.recUrl);
+      a.play();
+    }
+
+    function go(view, sceneId, lineIndex) {
+      stopAll();
+      state.view = view;
+      if (sceneId) state.sceneId = sceneId;
+      if (typeof lineIndex === "number") state.lineIndex = lineIndex;
+      if (view === "scene") {
+        const sc = scene();
+        if (sc && state.lineIndex >= sc.lines.length) state.lineIndex = 0;
+      }
+      render();
+    }
+
+    function hashFromState() {
+      if (state.view === "words") return "#words";
+      if (state.view === "inbox") return "#inbox";
+      if (state.view === "scene" && state.sceneId) return "#scene/" + state.sceneId;
+      return "#home";
+    }
+
+    function applyHash() {
+      const h = (location.hash || "#home").replace(/^#/, "");
+      const parts = h.split("/");
+      if (parts[0] === "words") go("words");
+      else if (parts[0] === "inbox") go("inbox");
+      else if (parts[0] === "scene" && parts[1]) go("scene", parts[1], 0);
+      else go("home");
+    }
+
+    function pushHash() {
+      const next = hashFromState();
+      if (location.hash !== next) history.replaceState(null, "", next);
+    }
+
+    function render() {
+      const shell = document.getElementById("shell");
+      shell.classList.toggle("home", state.view === "home" || state.view === "words" || state.view === "inbox");
+      document.getElementById("top").innerHTML = renderTop();
+      document.getElementById("banner").innerHTML = state.noVoice
+        ? '<div class="banner">本机暂无英语语音包。iPhone：设置 → 辅助功能 → 朗读内容 → 声音，下载英语。仍可看文本练习。</div>'
+        : "";
+      document.getElementById("main").innerHTML =
+        state.view === "home" ? renderHome() :
+        state.view === "words" ? renderWords() :
+        state.view === "inbox" ? renderInbox() :
+        renderScene();
+      const player = document.getElementById("player");
+      if (state.view === "scene") {
+        player.hidden = false;
+        renderPlayer();
+      } else {
+        player.hidden = true;
+        player.innerHTML = "";
+      }
+      pushHash();
+      bind();
+    }
+
+    function renderTop() {
+      if (state.view === "home") {
+        return '<div></div><h1>外贸英语跟读<span class="sub">户外厨房 · 不锈钢 · WhatsApp</span></h1><button class="ghost" id="btnSet">设置</button>';
+      }
+      const title = state.view === "words" ? "单词本" : state.view === "inbox" ? "今日询盘" : (scene() ? scene().title : "");
+      const sub = state.view === "scene" && scene() ? scene().goal : state.view === "inbox" ? "贴新询盘 → 生成回复稿 → 跟读后发出去" : "点单词听读音";
+      return '<button class="icon-btn" id="btnBack">←</button><h1>' + escapeHtml(title) + '<span class="sub">' + escapeHtml(sub) + "</span></h1><button class=\"ghost\" id=\"btnSet\">设置</button>";
+    }
+
+    function renderHome() {
+      const cards = allScenes().map((sc) => {
+        const d = sceneDone(sc);
+        const n = sc.lines.length;
+        const no = sc.id === "mine" ? "今" : String(SCENES.findIndex((s) => s.id === sc.id) + 1);
+        return '<button class="scene-card" data-scene="' + sc.id + '">' +
+          '<span class="no">' + no + "</span>" +
+          "<div><strong>" + sc.title + "</strong><em>" + sc.goal + "</em></div>" +
+          '<span class="prog">' + (d ? '<span class="ok">' + d + "/" + n + "</span>" : "0/" + n) + "</span></button>";
+      }).join("");
+      const nNew = unreadInquiries().length;
+      const inboxLab = nNew ? "今日新询盘 · " + nNew + " 条待练" : "贴阿里 / WhatsApp 询盘，生成回复并跟读";
+      return '<div class="hero"><b>新询盘进来，先跟读再发出去。</b><p>贴客户原话 → 自动出英文回复稿 → 一句句跟读 → 复制发 WhatsApp。生产就是学习。</p><div class="tips"><span>不监听 WhatsApp</span><span>回复稿可改再复制</span><span>只存在这台电脑</span></div></div>' +
+        '<button class="scene-card" id="btnInbox" style="margin-bottom:8px"><span class="no">+</span><div><strong>今日询盘</strong><em>' + inboxLab + "</em></div>" +
+        (nNew ? '<span class="prog"><span class="ok">' + nNew + " 新</span></span>" : "") + "</button>" +
+        '<div class="scene-list">' + cards + "</div>" +
+        '<div class="sec-title">单词</div>' +
+        '<button class="scene-card" id="btnWords"><span class="no">Aa</span><div><strong>产品 / 材质 / 交易词</strong><em>carcass · EXW · lead time · 316</em></div></button>';
+    }
+
+    function renderScene() {
+      const sc = scene();
+      if (!sc) return '<p class="empty">没有这个场景</p>';
+      if (!sc.lines.length) return '<p class="empty">还没有句子。去「从今天工作加入」贴一段聊天。</p>';
+      const rows = sc.lines.map((ln, i) => {
+        const on = i === state.lineIndex ? " on" : "";
+        const who = ln.role === "me" ? "你 · 工厂" : "客户 · 经销商";
+        const done = isDone(sc.id, i) ? " · 已跟读" : "";
+        const del = sc.id === "mine" ? '<button class="del" data-del="' + i + '" type="button">×</button>' : "";
+        return '<div class="row ' + ln.role + '"><button class="bubble' + on + '" data-line="' + i + '">' +
+          del +
+          '<div class="who">' + who + done + "</div>" +
+          '<div class="en">' + escapeHtml(ln.en) + "</div>" +
+          '<div class="zh">' + escapeHtml(ln.zh) + "</div></button></div>";
+      }).join("");
+      const copy = sc.id === "mine"
+        ? '<div class="copybar"><button class="btn primary" id="btnCopyReply">复制回复稿（发 WhatsApp）</button></div>'
+        : "";
+      return copy + '<div class="chat">' + rows + "</div>";
+    }
+
+    function renderInbox() {
+      const cands = state.candidates || [];
+      const files = state.fileInbox || [];
+      const fileCards = files.map((q) => {
+        const unread = q.id && !state.seenInbox[q.id];
+        const meta = [q.date, q.source, q.from].filter(Boolean).join(" · ");
+        return '<button class="cand" data-inq="' + escapeHtml(q.id || "") + '">' +
+          '<div class="tag">' + (unread ? "未练" : "已看") + (meta ? " · " + escapeHtml(meta) : "") + "</div>" +
+          "<b>" + escapeHtml((q.raw || "").slice(0, 90)) + ((q.raw || "").length > 90 ? "…" : "") + "</b></button>";
+      }).join("");
+      const list = cands.map((c, i) => {
+        const tag = c.kind === "word" ? "单词" : (c.role === "them" ? "客户原话" : (c.pack ? "回复稿" : "句子"));
+        const src = c.src && c.src !== "回复稿" ? '<div class="src">原文：' + escapeHtml(c.src) + "</div>" : "";
+        return '<button class="cand" data-add="' + i + '"><div class="tag">' + tag + " · 点一下加入跟读</div>" +
+          "<b>" + escapeHtml(c.en) + "</b>" +
+          '<div class="zh" style="opacity:1;margin-top:4px">' + escapeHtml(c.zh || "") + "</div>" + src + "</button>";
+      }).join("");
+      return '<p class="empty" style="padding-top:0">把阿里国际站 / WhatsApp 新询盘贴进来。系统会生成<strong>可直接发出去的英文回复</strong>。你先跟读，再复制发送。</p>' +
+        (files.length ? '<div class="sec-title">待练询盘（english-inbox.json）</div>' + fileCards : "") +
+        '<textarea class="inbox" id="inboxBox" placeholder="例：\nHi, we are a distributor in France.\nDo you make outdoor kitchen in stainless?\nWe install near the sea.\nPrice for two Ultra 3200?">' + escapeHtml(state.inboxText) + "</textarea>" +
+        '<div class="btns" style="margin-top:10px;grid-template-columns:1fr 1fr">' +
+          '<button class="btn" id="btnExtract">生成回复稿</button>' +
+          '<button class="btn primary" id="btnAddAll"' + (cands.length ? "" : " disabled") + ">加入并去跟读</button>" +
+        "</div>" +
+        '<div class="sec-title">或手写一句回复</div>' +
+        '<input class="field" id="handEn" placeholder="English sentence" />' +
+        '<input class="field" id="handZh" placeholder="中文意思" style="margin-top:8px" />' +
+        '<button class="btn" id="btnHand" style="width:100%;margin-top:8px">加入这一句</button>' +
+        (cands.length ? '<div class="sec-title">待加入 · ' + cands.length + "</div>" + list : '<p class="empty">点「生成回复稿」后：灰色=客户原话，其余=你要发的回复。</p>');
+    }
+
+    function renderWords() {
+      const html = allWords().map((g) => {
+        const chips = g.items.map((w) => {
+          const k = w.en;
+          const on = state.wordKey === k ? " on" : "";
+          return '<button class="chip' + on + '" data-word="' + encodeURIComponent(k) + '"><b>' + escapeHtml(w.en) + "</b><i>" + escapeHtml(w.zh) + "</i></button>";
+        }).join("");
+        return '<div class="group"><h3>' + g.g + '</h3><div class="chips">' + chips + "</div></div>";
+      }).join("");
+      const found = allWords().flatMap((g) => g.items).find((w) => w.en === state.wordKey);
+      const sample = found
+        ? '<div class="group word-sample"><b>' + escapeHtml(found.en) + "</b> · " + escapeHtml(found.zh) + "<br/>点上方单词即朗读。再点一次可重复。</div>"
+        : '<p class="empty">点一个词听读音。</p>';
+      return '<div class="word-groups">' + html + sample + "</div>";
+    }
+
+    function renderPlayer() {
+      const ln = line();
+      const sc = scene();
+      if (!ln || !sc) return;
+      const recLabel = state.recording ? "停录" : "录音";
+      document.getElementById("player").innerHTML =
+        '<div class="karaoke" id="karaoke">' + karaokeHtml(ln.en, -1) + "</div>" +
+        '<div class="k-zh">' + escapeHtml(ln.zh) + "</div>" +
+        '<div class="phase"><i id="phaseBar"></i></div>' +
+        '<div class="phase-lab" id="phaseLab">' + escapeHtml(state.label) + "</div>" +
+        '<div class="btns">' +
+          '<button class="btn" id="btnListen">听</button>' +
+          '<button class="btn primary" id="btnShadow">跟读</button>' +
+          '<button class="btn warn" id="btnRec">' + recLabel + "</button>" +
+        "</div>" +
+        '<div class="nav-line">' +
+          '<button id="btnPrev">上一句</button>' +
+          "<span>" + (state.lineIndex + 1) + " / " + sc.lines.length + (state.recUrl ? ' · <a id="btnMine" href="#">我的录音</a>' : "") + "</span>" +
+          '<button id="btnNext">下一句</button>' +
+        "</div>" +
+        '<div class="rates">' +
+          rateBtn(0.7, "慢") + rateBtn(0.85, "跟读") + rateBtn(1, "正常") +
+          '<span class="acc">' + accBtn("us", "美音") + accBtn("uk", "英音") + "</span>" +
+        "</div>";
+      bindPlayer();
+    }
+
+    function rateBtn(v, lab) {
+      return '<button data-rate="' + v + '" class="' + (state.rate === v ? "on" : "") + '">' + lab + "</button>";
+    }
+    function accBtn(v, lab) {
+      return '<button data-acc="' + v + '" class="' + (state.accent === v ? "on" : "") + '">' + lab + "</button>";
+    }
+
+    function refreshSceneProgress() {
+      document.querySelectorAll(".bubble").forEach((el) => {
+        const i = +el.getAttribute("data-line");
+        const ln = scene().lines[i];
+        const who = ln.role === "me" ? "你 · 工厂" : "客户 · 经销商";
+        const done = isDone(scene().id, i) ? " · 已跟读" : "";
+        el.querySelector(".who").textContent = who + done;
+        el.classList.toggle("on", i === state.lineIndex);
+      });
+    }
+
+    function bind() {
+      const back = document.getElementById("btnBack");
+      if (back) back.onclick = () => go("home");
+      const set = document.getElementById("btnSet");
+      if (set) set.onclick = openSheet;
+      document.querySelectorAll("[data-scene]").forEach((el) => {
+        el.onclick = () => go("scene", el.getAttribute("data-scene"), 0);
+      });
+      const bw = document.getElementById("btnWords");
+      if (bw) bw.onclick = () => go("words");
+      const bi = document.getElementById("btnInbox");
+      if (bi) bi.onclick = () => go("inbox");
+      document.querySelectorAll("[data-del]").forEach((el) => {
+        el.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          removeMineLine(+el.getAttribute("data-del"));
+        };
+      });
+      const box = document.getElementById("inboxBox");
+      if (box) {
+        box.oninput = () => { state.inboxText = box.value; };
+        document.getElementById("btnExtract").onclick = () => {
+          state.inboxText = box.value;
+          const got = buildInquiryDrill(box.value);
+          state.candidates = got.lines.concat(got.words);
+          render();
+        };
+        document.getElementById("btnAddAll").onclick = () => {
+          if (!state.candidates.length) return;
+          addCandidates(state.candidates);
+          if (state.activeInqId) {
+            state.seenInbox[state.activeInqId] = 1;
+            saveSeenInbox();
+            state.activeInqId = "";
+          }
+          state.candidates = [];
+          go("scene", "mine", 0);
+        };
+        document.getElementById("btnHand").onclick = () => {
+          const en = (document.getElementById("handEn").value || "").trim();
+          const zh = (document.getElementById("handZh").value || "").trim();
+          if (en.split(/\s+/).length < 3) return;
+          addCandidates([{ kind: "line", role: "me", en: en, zh: zh || "手写" }]);
+          go("scene", "mine", state.mine.lines.length - 1);
+        };
+        document.querySelectorAll("[data-add]").forEach((el) => {
+          el.onclick = () => {
+            const item = state.candidates[+el.getAttribute("data-add")];
+            if (!item) return;
+            addCandidates([item]);
+            state.candidates.splice(+el.getAttribute("data-add"), 1);
+            render();
+          };
+        });
+        document.querySelectorAll("[data-inq]").forEach((el) => {
+          el.onclick = () => {
+            const id = el.getAttribute("data-inq");
+            const q = state.fileInbox.find((x) => x.id === id);
+            if (!q) return;
+            state.activeInqId = id;
+            state.inboxText = q.raw || "";
+            const got = buildInquiryDrill(state.inboxText);
+            state.candidates = got.lines.concat(got.words);
+            render();
+          };
+        });
+      }
+      const copyBtn = document.getElementById("btnCopyReply");
+      if (copyBtn) copyBtn.onclick = copyReply;
+      document.querySelectorAll("[data-line]").forEach((el) => {
+        el.onclick = () => {
+          state.lineIndex = +el.getAttribute("data-line");
+          state.recUrl = "";
+          renderPlayer();
+          refreshSceneProgress();
+          playListen();
+        };
+      });
+      document.querySelectorAll("[data-word]").forEach((el) => {
+        el.onclick = () => {
+          state.wordKey = decodeURIComponent(el.getAttribute("data-word"));
+          render();
+          speak(state.wordKey);
+        };
+      });
+    }
+
+    function bindPlayer() {
+      document.getElementById("btnListen").onclick = playListen;
+      document.getElementById("btnShadow").onclick = playShadow;
+      document.getElementById("btnRec").onclick = toggleRecord;
+      document.getElementById("btnPrev").onclick = () => shiftLine(-1);
+      document.getElementById("btnNext").onclick = () => shiftLine(1);
+      const mine = document.getElementById("btnMine");
+      if (mine) mine.onclick = (e) => { e.preventDefault(); playMine(); };
+      document.querySelectorAll("[data-rate]").forEach((el) => {
+        el.onclick = () => { state.rate = +el.getAttribute("data-rate"); renderPlayer(); };
+      });
+      document.querySelectorAll("[data-acc]").forEach((el) => {
+        el.onclick = () => {
+          state.accent = el.getAttribute("data-acc");
+          const v = pickVoice();
+          if (v) state.voiceURI = v.voiceURI;
+          renderPlayer();
+        };
+      });
+      document.getElementById("karaoke").onclick = (e) => {
+        const w = e.target.closest(".w");
+        if (!w) return;
+        speak(w.textContent.replace(/[.,!?;:—-]+$/g, ""));
+      };
+    }
+
+    function shiftLine(d) {
+      const sc = scene();
+      if (!sc) return;
+      stopAll();
+      state.lineIndex = (state.lineIndex + d + sc.lines.length) % sc.lines.length;
+      state.recUrl = "";
+      renderPlayer();
+      refreshSceneProgress();
+      document.querySelector('.bubble[data-line="' + state.lineIndex + '"]')?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+
+    function openSheet() {
+      collectVoices();
+      const opts = state.voices.map((v) => {
+        const sel = v.voiceURI === state.voiceURI ? " selected" : "";
+        return "<option value=\"" + escapeHtml(v.voiceURI) + "\"" + sel + ">" + escapeHtml(v.name + " · " + v.lang) + "</option>";
+      }).join("");
+      document.getElementById("mask").classList.add("show");
+      document.getElementById("sheetHost").innerHTML =
+        '<div class="sheet"><h2>声音</h2>' +
+        (opts ? '<select class="voice" id="voiceSel">' + opts + "</select>" : "<p class=\"hint\">没有检测到英语语音。</p>") +
+        '<p class="hint">跟读节奏：听示范 → 留白给你说 → 再放一遍对照。点句子里的单词可单听。录音仅在本地，不上传。</p>' +
+        '<button class="btn primary" id="closeSheet" style="width:100%;margin-top:12px">好</button></div>';
+      document.getElementById("mask").onclick = closeSheet;
+      document.getElementById("closeSheet").onclick = closeSheet;
+      const sel = document.getElementById("voiceSel");
+      if (sel) sel.onchange = () => { state.voiceURI = sel.value; };
+    }
+    function closeSheet() {
+      document.getElementById("mask").classList.remove("show");
+      document.getElementById("sheetHost").innerHTML = "";
+    }
+
+    function copyReply() {
+      const sc = scene();
+      if (!sc) return;
+      const text = sc.lines.filter((l) => l.role === "me").map((l) => l.en).join("\n\n");
+      if (!text) return;
+      const done = () => {
+        const btn = document.getElementById("btnCopyReply");
+        if (btn) { btn.textContent = "已复制，去 WhatsApp 粘贴"; setTimeout(() => { if (btn) btn.textContent = "复制回复稿（发 WhatsApp）"; }, 1600); }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      } else fallbackCopy(text, done);
+    }
+    function fallbackCopy(text, done) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      ta.remove();
+      done();
+    }
+    async function loadFileInbox() {
+      try {
+        const r = await fetch("english-inbox.json?t=" + Date.now());
+        if (!r.ok) return;
+        const data = await r.json();
+        state.fileInbox = Array.isArray(data.inquiries) ? data.inquiries : [];
+      } catch (e) {}
+    }
+
+    speechSynthesis.onvoiceschanged = () => { collectVoices(); };
+    collectVoices();
+    window.addEventListener("hashchange", applyHash);
+    document.addEventListener("visibilitychange", () => { if (document.hidden) stopAll(); });
+    applyHash();
+    loadFileInbox().then(() => {
+      if (state.view === "home" || state.view === "inbox") render();
+    });
+  </script>
+</body>
+</html>
