@@ -261,6 +261,7 @@
   <div class="player" id="player" hidden></div>
   <div class="sheet-mask" id="mask"></div>
   <div id="sheetHost"></div>
+  <audio id="ttsPlayer" playsinline webkit-playsinline preload="auto"></audio>
 
   <script>
     const STORE = "dd-en-drill-v1";
@@ -788,49 +789,168 @@
       });
     }
 
-    function needNetTts() {
+    function isHonorAndroid() {
+      return /Android|HONOR|Huawei|HarmonyOS|OpenHarmony/i.test(navigator.userAgent || "");
+    }
+
+    function useNetTts() {
+      if (isHonorAndroid()) return true;
       return !synth() || state.noVoice;
     }
 
+    function ttsEl() {
+      return document.getElementById("ttsPlayer");
+    }
+
     function stopNetAudio() {
-      if (!netAudio) return;
-      try { netAudio.onended = null; netAudio.onerror = null; netAudio.pause(); netAudio.src = ""; } catch (e) {}
+      var a = ttsEl();
+      if (!a) return;
+      try {
+        a.onended = null;
+        a.onerror = null;
+        a.pause();
+      } catch (e) {}
       netAudio = null;
     }
 
+    function unlockAudio() {
+      var a = ttsEl();
+      if (!a) return Promise.resolve();
+      a.muted = false;
+      a.volume = 1;
+      if (state.unlocked) return Promise.resolve();
+      a.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+      return a.play().then(function () {
+        state.unlocked = true;
+      }).catch(function () {
+        state.unlocked = true;
+      });
+    }
+
+    function splitSpeak(text) {
+      var t = String(text || "").replace(/\s+/g, " ").trim();
+      if (!t) return [];
+      var raw = t.split(/([.!?;:])/);
+      var clauses = [];
+      for (var i = 0; i < raw.length; i += 2) {
+        var p = (raw[i] + (raw[i + 1] || "")).trim();
+        if (p) clauses.push(p);
+      }
+      if (!clauses.length) clauses = [t];
+      var out = [];
+      clauses.forEach(function (p) {
+        var words = p.split(/\s+/);
+        if (words.length <= 12) out.push(p);
+        else {
+          for (var j = 0; j < words.length; j += 10) out.push(words.slice(j, j + 10).join(" "));
+        }
+      });
+      return out;
+    }
+
+    function ttsUrls(text) {
+      var q = encodeURIComponent(text);
+      var words = text.trim().split(/\s+/).length;
+      var youdao = [
+        "https://dict.youdao.com/dictvoice?audio=" + q + "&type=2",
+        "https://dict.youdao.com/dictvoice?le=en&audio=" + q
+      ];
+      var baidu = "https://fanyi.baidu.com/gettts?lan=en&text=" + q + "&spd=4&source=web";
+      if (words <= 2) return youdao.concat([baidu]);
+      return [baidu].concat(youdao);
+    }
+
     function speakNet(text) {
+      var parts = splitSpeak(text);
+      if (!parts.length) return Promise.resolve();
+      return unlockAudio().then(function () {
+        function next(i) {
+          if (i >= parts.length) return Promise.resolve();
+          return playTtsUrls(parts[i], ttsUrls(parts[i]), 0).then(function () {
+            return next(i + 1);
+          });
+        }
+        return next(0);
+      });
+    }
+
+    function playTtsUrls(text, urls, idx) {
       return new Promise(function (resolve) {
+        if (idx >= urls.length) {
+          setPhase("idle", "没声音：打开媒体音量，用 Chrome 打开，不要用微信");
+          resolve();
+          return;
+        }
+        var a = ttsEl();
+        if (!a) { resolve(); return; }
         stopNetAudio();
-        var type = state.accent === "uk" ? "1" : "2";
-        var url = "https://dict.youdao.com/dictvoice?audio=" + encodeURIComponent(text) + "&type=" + type;
-        var a = new Audio(url);
-        netAudio = a;
         var t0 = Date.now();
         var words = text.trim().split(/\s+/);
         var est = Math.max(1200, words.length * 380 / state.rate);
         var i = 0;
+        var settled = false;
         paintKaraoke(text, -1);
         var tick = setInterval(function () {
-          if (netAudio !== a) { clearInterval(tick); return; }
+          if (settled) { clearInterval(tick); return; }
           paintKaraoke(text, i);
           i += 1;
           if (i >= words.length) clearInterval(tick);
         }, est / Math.max(1, words.length));
-        function done() {
+        function finishOk() {
+          if (settled) return;
+          settled = true;
           clearInterval(tick);
           state.lastMs = Math.max(900, Date.now() - t0);
           paintKaraoke(text, 99);
-          if (netAudio === a) netAudio = null;
           resolve();
         }
-        a.onended = done;
-        a.onerror = done;
-        a.play().catch(done);
+        function tryNext() {
+          if (settled) return;
+          settled = true;
+          clearInterval(tick);
+          playTtsUrls(text, urls, idx + 1).then(resolve);
+        }
+        a.onended = function () {
+          if (words.length > 2 && isFinite(a.duration) && a.duration > 0 && a.duration < 0.5) tryNext();
+          else finishOk();
+        };
+        a.onerror = tryNext;
+        a.onloadedmetadata = function () {
+          if (words.length > 2 && isFinite(a.duration) && a.duration > 0 && a.duration < 0.5) tryNext();
+        };
+        a.muted = false;
+        a.volume = 1;
+        a.src = urls[idx];
+        netAudio = a;
+        var p = a.play();
+        if (p && p.catch) p.catch(tryNext);
+      });
+    }
+
+    function beepTest() {
+      return unlockAudio().then(function () {
+        try {
+          var Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return speakNet("hello");
+          var ctx = new Ctx();
+          if (ctx.state === "suspended") ctx.resume();
+          var o = ctx.createOscillator();
+          var g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.frequency.value = 880;
+          g.gain.value = 0.18;
+          o.start();
+          setTimeout(function () { try { o.stop(); } catch (e) {} }, 200);
+          return speakNet("hello");
+        } catch (e) {
+          return speakNet("hello");
+        }
       });
     }
 
     function speak(text) {
-      if (needNetTts()) return speakNet(text);
+      if (useNetTts()) return speakNet(text);
       return new Promise((resolve, reject) => {
         const s = synth();
         if (!s) { return speakNet(text).then(resolve); }
@@ -1000,8 +1120,8 @@
       const shell = document.getElementById("shell");
       shell.classList.toggle("home", state.view === "home" || state.view === "words" || state.view === "inbox");
       document.getElementById("top").innerHTML = renderTop();
-      document.getElementById("banner").innerHTML = state.noVoice
-        ? '<div class="banner">这台荣耀/安卓没装英语语音包，已改用在线朗读，点「听」就能出声。想装系统包：设置 → 辅助功能 → 无障碍 → 文字转语音 → 下载英语（美国）。</div>'
+      document.getElementById("banner").innerHTML = isHonorAndroid() || state.noVoice
+        ? '<div class="banner">荣耀请把<strong>媒体音量</strong>拉高，用 Chrome 打开。单词用有道，句子已改整句朗读。v6</div>'
         : "";
       document.getElementById("main").innerHTML =
         state.view === "home" ? renderHome() :
@@ -1042,6 +1162,7 @@
       const nNew = unreadInquiries().length;
       const inboxLab = nNew ? "今日新询盘 · " + nNew + " 条待练" : "贴阿里 / WhatsApp 询盘，生成回复并跟读";
       return '<div class="hero"><b>新询盘进来，先跟读再发出去。</b><p>贴客户原话 → 自动出英文回复稿 → 一句句跟读 → 复制发 WhatsApp。生产就是学习。</p><div class="tips"><span>不监听 WhatsApp</span><span>回复稿可改再复制</span><span>只存在这台电脑</span></div></div>' +
+        '<button class="scene-card" id="btnBeep" style="margin-bottom:8px"><span class="no">♪</span><div><strong>测喇叭</strong><em>先听一声“hello”，确认媒体音量开着</em></div></button>' +
         '<button class="scene-card" id="btnInbox" style="margin-bottom:8px"><span class="no">+</span><div><strong>今日询盘</strong><em>' + inboxLab + "</em></div>" +
         (nNew ? '<span class="prog"><span class="ok">' + nNew + " 新</span></span>" : "") + "</button>" +
         '<div class="scene-list">' + cards + "</div>" +
@@ -1174,6 +1295,13 @@
       if (bw) bw.onclick = () => go("words");
       const bi = document.getElementById("btnInbox");
       if (bi) bi.onclick = () => go("inbox");
+      const bb = document.getElementById("btnBeep");
+      if (bb) bb.onclick = function () {
+        bb.querySelector("em").textContent = "正在出声…";
+        beepTest().then(function () {
+          bb.querySelector("em").textContent = "听到 hello 就对了。没听到就开媒体音量，换 Chrome";
+        });
+      };
       document.querySelectorAll("[data-del]").forEach((el) => {
         el.onclick = (e) => {
           e.preventDefault();
