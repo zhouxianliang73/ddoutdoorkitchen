@@ -2,20 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="refresh" content="0;url=/kitchen/?door=ultra&amp;size=3200&amp;lang=fr" />
+  <meta http-equiv="refresh" content="0;url=/kitchen/" />
   <title>Redirecting…</title>
   <script>
     (function () {
-      var dest = "/kitchen/";
-      var params = new URLSearchParams(location.search || "");
-      if (!params.get("door")) params.set("door", "ultra");
-      if (!params.get("size")) params.set("size", "3200");
-      if (!params.get("lang")) params.set("lang", "fr");
-      location.replace(dest + "?" + params.toString());
+      location.replace("/kitchen/" + (location.search || ""));
     })();
   </script>
 </head>
 <body>
-  <p><a href="/kitchen/?door=ultra&amp;size=3200&amp;lang=fr">Outdoor Kitchen</a></p>
+  <p><a href="/kitchen/">Outdoor Kitchen</a></p>
 </body>
 </html>

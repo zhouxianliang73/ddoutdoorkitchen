@@ -2,8 +2,8 @@
   var DATA = null;
   var state = {
     lang: "fr",
-    door: "ultra",
-    size: "3200",
+    door: "all",
+    size: "all",
     submitting: false
   };
   var LANG_KEY = "dd_outdoor_kitchen_lang_v2";
@@ -556,8 +556,8 @@
     DATA = window.OUTDOOR_KITCHEN;
     opts = opts || {};
     state.lang = DATA.defaultLang || "fr";
-    state.door = "ultra";
-    state.size = "3200";
+    state.door = "all";
+    state.size = "all";
     try {
       var saved = localStorage.getItem(LANG_KEY);
       if (saved && DATA.langs.indexOf(saved) >= 0) state.lang = saved;
