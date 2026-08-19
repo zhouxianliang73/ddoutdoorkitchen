@@ -159,6 +159,13 @@
     );
   }
 
+  function imageUrl(src) {
+    var s = String(src || "");
+    if (!s) return "";
+    if (/^https?:\/\//i.test(s) || s.charAt(0) === "/") return s;
+    return "/cases/outdoor-kitchen/" + s.replace(/^\.\//, "");
+  }
+
   function renderModel(m) {
     var base = m.base
       .map(function (k) {
@@ -175,7 +182,7 @@
       esc(m.id) +
       '">' +
       '<div class="model-media"><img src="' +
-      esc(m.image) +
+      esc(imageUrl(m.image)) +
       '" alt="' +
       esc(m.code + " " + m.name) +
       '" loading="lazy" /></div>' +
