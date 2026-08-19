@@ -70,12 +70,11 @@
   }
 
   function shareUrl() {
-    // 站内转发统一短链；域名在 GitHub Pages，WhatsApp/Meta 可抓 OG 封面
+    // 默认分享纯短链；仅在筛选了门型/尺寸时带参数
     var base = "https://ddoutdoorkitchen.com/kitchen/";
     var parts = [];
     if (state.door && state.door !== "all") parts.push("door=" + encodeURIComponent(state.door));
     if (state.size && state.size !== "all") parts.push("size=" + encodeURIComponent(String(state.size)));
-    if (state.lang) parts.push("lang=" + encodeURIComponent(state.lang));
     return parts.length ? base + "?" + parts.join("&") : base;
   }
 
