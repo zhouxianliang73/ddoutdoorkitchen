@@ -13,7 +13,7 @@
     <meta property="og:title" content="DD Deep Design · 选品中心" />
     <meta property="og:description" content="DD Deep Design 选品中心 — 设计深化与 B 端项目协作" />
     <meta property="og:url" content="https://ddoutdoorkitchen.com/" />
-    <meta property="og:image" content="https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/cases/christophe/assets/u8-ultra-3200.jpg" />
+    <meta property="og:image" content="https://ddoutdoorkitchen.com/cases/outdoor-kitchen/assets/u8-ultra-3200.jpg" />
     <meta property="og:image:width" content="1400" />
     <meta property="og:image:height" content="781" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -1114,6 +1114,149 @@
             color: var(--text-muted);
             margin: -4px 0 12px;
         }
+        .case-detail-page {
+            padding-bottom: 24px;
+        }
+        .case-detail-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0 12px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #111827;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .case-detail-cover {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #f3f4f6;
+            border-radius: 0;
+        }
+        .case-detail-cover-wrap {
+            margin: 0 -16px;
+            background: #f3f4f6;
+        }
+        html.mp-shell .case-detail-cover-wrap {
+            margin: 0;
+        }
+        .case-detail-placeholder {
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-weight: 600;
+            background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+        }
+        .case-detail-body {
+            margin-top: 0;
+        }
+        .case-detail-title {
+            margin: 8px 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .case-detail-summary {
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .case-detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .case-detail-tags .tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            background: #f3f4f6;
+            border-radius: 999px;
+            color: #4b5563;
+        }
+        .case-detail-hint {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .case-detail-h5 {
+            display: block;
+            margin-top: 12px;
+            text-align: center;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: #111827;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .case-contact-card {
+            margin-top: 12px;
+        }
+        .case-contact-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .case-contact-note {
+            display: block;
+            margin: 8px 0 12px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #6b7280;
+        }
+        .case-lead-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .case-lead-row input {
+            flex: 1;
+            min-width: 0;
+            height: 42px;
+            padding: 0 12px;
+            font-size: 14px;
+            color: #111827;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .case-contact-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+            cursor: pointer;
+        }
+        .case-contact-btn[disabled] { opacity: 0.65; }
+        .case-contact-zh {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .case-contact-en {
+            margin-top: 2px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .case-lead-msg {
+            min-height: 18px;
+            margin: 8px 0 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .case-lead-msg.ok { color: #15803d; }
+        .case-lead-msg.err { color: #b91c1c; }
         .hot-scroll .hot-item .img img {
             width: 100%;
             height: 100%;
@@ -6757,6 +6900,11 @@
             </div>
         </div>
 
+        <!-- ========== 精选案例详情（对齐小程序 pages/case-detail） ========== -->
+        <div class="page" id="page-case-detail">
+            <div class="case-detail-page" id="caseDetailRoot"></div>
+        </div>
+
         <!-- ========== 底部 Tab ========== -->
         <nav class="bottom-tabs">
             <button class="tab-item active" data-page="page-home">
@@ -6812,6 +6960,9 @@
         const pages = Object.fromEntries(
             [...document.querySelectorAll('.page')].map(p => [p.id, p])
         );
+        const CASE_LEAD_KEY = 'dd_case_leads_h5_v1';
+        const homeCasesById = {};
+        let activeHomeCase = null;
 
         function catalogSpaces() {
             return Array.from(new Set((catalog || []).map(function (p) { return p.space; }).filter(Boolean))).sort();
@@ -7159,6 +7310,9 @@
                 if (!res.ok) throw new Error('无法加载案例');
                 const data = await res.json();
                 const cases = (data.cases || []).slice().sort((a, b) => (a.order || 0) - (b.order || 0));
+                cases.forEach((c) => {
+                    if (c && c.id) homeCasesById[c.id] = c;
+                });
                 const remoteHtml = cases.map((c) => {
                     const cover = cdnifyImageUrl(c.cover);
                     const detail = cdnifyImageUrl(c.detail || c.cover);
@@ -7216,6 +7370,105 @@
             }).join('');
         }
 
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function openHomeCaseDetail(c) {
+            activeHomeCase = c || null;
+            const root = document.getElementById('caseDetailRoot');
+            if (!root || !c) return;
+            const cover = cdnifyImageUrl(c.detail || c.cover);
+            const tag = [c.projectType, c.status].filter(Boolean).join(' · ');
+            const highlights = Array.isArray(c.highlights) ? c.highlights : [];
+            const h5 = String(c.h5Url || '').trim();
+            root.innerHTML =
+                '<button type="button" class="case-detail-back" id="caseDetailBack">‹ 返回</button>' +
+                '<div class="case-detail-cover-wrap">' +
+                (cover
+                    ? '<img class="case-detail-cover" id="caseDetailCover" src="' + escapeHtml(cover) + '" alt="' + escapeHtml(c.title || '') + '" />'
+                    : '<div class="case-detail-placeholder">' + escapeHtml(c.projectType || '案例') + '</div>') +
+                '</div>' +
+                '<div class="card case-detail-body">' +
+                '<div class="mp-case-tag">' + escapeHtml(tag) + (h5 ? ' · H5' : '') + '</div>' +
+                '<h1 class="case-detail-title">' + escapeHtml(c.title || '精选案例') + '</h1>' +
+                '<p class="case-detail-summary">' + escapeHtml(c.summary || '') + '</p>' +
+                (highlights.length
+                    ? '<div class="case-detail-tags">' + highlights.map(function (h) {
+                        return '<span class="tag">' + escapeHtml(h) + '</span>';
+                    }).join('') + '</div>'
+                    : '') +
+                (cover ? '<div class="case-detail-hint">点击方案图可放大查看</div>' : '') +
+                (h5 ? '<a class="case-detail-h5" href="' + escapeHtml(h5) + '">查看全部型号</a>' : '') +
+                '</div>' +
+                '<div class="card case-contact-card">' +
+                '<div class="case-contact-title">留下联系方式 / Contact</div>' +
+                '<span class="case-contact-note">看中同款可留手机、社媒或邮箱，业务会联系你 / Phone, social or email</span>' +
+                '<form id="caseLeadForm" autocomplete="on">' +
+                '<div class="case-lead-row">' +
+                '<input name="phone" type="tel" maxlength="20" placeholder="手机 / Phone" />' +
+                '<input name="wechat" type="text" maxlength="40" placeholder="社媒 / Social" />' +
+                '</div>' +
+                '<div class="case-lead-row">' +
+                '<input name="email" type="email" maxlength="80" placeholder="邮箱 / Email" />' +
+                '<input name="name" type="text" maxlength="20" placeholder="称呼 / Name" />' +
+                '</div>' +
+                '<button class="case-contact-btn" type="submit">' +
+                '<div class="case-contact-zh">提交，请联系我</div>' +
+                '<div class="case-contact-en">Contact me</div>' +
+                '</button>' +
+                '<p class="case-lead-msg" id="caseLeadMsg"></p>' +
+                '</form></div>';
+            switchPage('page-case-detail');
+        }
+
+        function setCaseLeadMsg(text, type) {
+            const el = document.getElementById('caseLeadMsg');
+            if (!el) return;
+            el.textContent = text || '';
+            el.className = 'case-lead-msg' + (type ? ' ' + type : '');
+        }
+
+        function submitHomeCaseLead(form) {
+            const phone = String(form.phone.value || '').replace(/\s+/g, '').trim();
+            const wechat = String(form.wechat.value || '').trim();
+            const email = String(form.email.value || '').trim();
+            const name = String(form.name.value || '').trim();
+            if (!phone && !wechat && !email) {
+                setCaseLeadMsg('请至少留一种联系方式 / Contact required', 'err');
+                return;
+            }
+            if (phone && phone.length < 6) {
+                setCaseLeadMsg('手机号好像不对 / Invalid phone', 'err');
+                return;
+            }
+            const lead = {
+                id: 'L' + Date.now().toString(36),
+                phone: phone,
+                wechat: wechat,
+                email: email,
+                name: name,
+                caseId: (activeHomeCase && activeHomeCase.id) || '',
+                caseTitle: (activeHomeCase && activeHomeCase.title) || '',
+                source: 'h5-case-detail',
+                createdAt: Date.now()
+            };
+            try {
+                let list = [];
+                try { list = JSON.parse(localStorage.getItem(CASE_LEAD_KEY) || '[]'); } catch (e) { list = []; }
+                if (!Array.isArray(list)) list = [];
+                list.unshift(lead);
+                localStorage.setItem(CASE_LEAD_KEY, JSON.stringify(list.slice(0, 80)));
+            } catch (e) {}
+            form.reset();
+            setCaseLeadMsg('已提交 / Submitted', 'ok');
+            showToast('已提交', '我们会尽快联系你');
+        }
+
         function initHomeInteractions() {
             document.getElementById('homeAiEntry')?.addEventListener('click', function () {
                 switchPage('page-shop');
@@ -7236,6 +7489,11 @@
                     return;
                 }
                 const h5 = card.getAttribute('data-h5-url');
+                const id = decodeURIComponent(card.getAttribute('data-case-id') || '');
+                if (id && homeCasesById[id]) {
+                    openHomeCaseDetail(homeCasesById[id]);
+                    return;
+                }
                 if (h5) {
                     location.href = h5;
                     return;
@@ -7257,6 +7515,22 @@
                 const card = e.target.closest('.mp-product-card');
                 if (!card) return;
                 switchPage('page-shop');
+            });
+            document.getElementById('caseDetailRoot')?.addEventListener('click', function (e) {
+                if (e.target.closest('#caseDetailBack')) {
+                    switchPage('page-home');
+                    return;
+                }
+                const cover = e.target.closest('#caseDetailCover');
+                if (cover && cover.src && typeof openLightboxUrl === 'function') {
+                    openLightboxUrl(cover.src, activeHomeCase && activeHomeCase.title || '精选案例');
+                }
+            });
+            document.getElementById('caseDetailRoot')?.addEventListener('submit', function (e) {
+                if (e.target && e.target.id === 'caseLeadForm') {
+                    e.preventDefault();
+                    submitHomeCaseLead(e.target);
+                }
             });
         }
 
@@ -11650,7 +11924,7 @@
                 showToast('ℹ️ 当前渠道无匹配 SKU', '可调整 channel 或扩充 catalog');
             } else if (!catalog.length) {
                 if (location.protocol === 'file:') {
-                    alert('无法直接双击打开 shop.html。\n\n请任选一种方式：\n1. 双击运行 preview.bat，再打开 http://localhost:8765/shop.html\n2. 访问 https://cloud1-d9gq2eo4oa43266fd-1301307199.tcloudbaseapp.com/shop.html');
+                    alert('无法直接双击打开 shop.html。\n\n请任选一种方式：\n1. 双击运行 preview.bat，再打开 http://localhost:8765/shop.html\n2. 访问 https://ddoutdoorkitchen.com/shop.html');
                 }
                 showToast('ℹ️ 产品库未加载', '请运行 preview.bat 或使用 GitHub Pages');
             }
