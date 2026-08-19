@@ -1,12 +1,12 @@
 (function () {
   var DATA = null;
   var state = {
-    lang: "fr",
+    lang: "en",
     door: "all",
     size: "all",
     submitting: false
   };
-  var LANG_KEY = "dd_outdoor_kitchen_lang_v2";
+  var LANG_KEY = "dd_outdoor_kitchen_lang_v3";
   var LEAD_KEY = "dd_outdoor_kitchen_leads_v1";
 
   function esc(s) {
@@ -554,7 +554,7 @@
   window.initOutdoorKitchenPage = function (opts) {
     DATA = window.OUTDOOR_KITCHEN;
     opts = opts || {};
-    state.lang = DATA.defaultLang || "fr";
+    state.lang = DATA.defaultLang || "en";
     state.door = "all";
     state.size = "all";
     try {

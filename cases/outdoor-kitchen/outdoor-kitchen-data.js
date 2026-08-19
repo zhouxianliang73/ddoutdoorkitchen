@@ -1,7 +1,7 @@
 window.OUTDOOR_KITCHEN = {
   langs: ["en", "zh", "fr"],
   langLabels: { en: "EN", zh: "中文", fr: "FR" },
-  defaultLang: "fr",
+  defaultLang: "en",
 
   ui: {
     en: {
