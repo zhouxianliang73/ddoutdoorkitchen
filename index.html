@@ -20,6 +20,7 @@
     <!-- Font Awesome 6 (免费) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="js/dd-config.js"></script>
+    <script src="js/catalog-delist.js"></script>
     <script src="js/compare-bridge.js"></script>
     <style>
         /* ============================================================
@@ -3222,11 +3223,7 @@
             font-variant-numeric: tabular-nums;
         }
         .media-cat-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: auto;
-            flex-shrink: 0;
+            display: none;
         }
         .media-cat-actions .media-add-btn {
             flex-shrink: 0;
@@ -3268,8 +3265,14 @@
             border-top: 1px solid var(--gray-100);
             border-radius: 0;
         }
+        .media-comm-upload-panel {
+            padding: 8px 12px 12px;
+        }
+        .media-comm-upload-panel .media-category-grid {
+            max-height: none;
+        }
         .proj-categorized-media .media-add-row {
-            padding: 8px 16px 12px;
+            display: none;
         }
         .media-layout-wrap--grid {
             padding: 0;
@@ -3306,7 +3309,72 @@
             flex: none;
             height: calc((100% - 3 * var(--layout-gutter, 12px)) / 4 / 3);
             min-height: 28px;
-            max-height: 36px;
+        }
+        .media-ant-tile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            min-width: 0;
+            padding: 0;
+            border: none;
+            border-radius: 8px;
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .media-ant-tile:hover,
+        .media-ant-tile:focus-visible {
+            color: #111827;
+            background: #eef2ff;
+        }
+        .media-ant-tile i {
+            position: relative;
+            z-index: 2;
+            font-size: 18px;
+            line-height: 1;
+        }
+        .media-ant-tile-line {
+            position: absolute;
+            inset: 5px;
+            z-index: 1;
+            pointer-events: none;
+            border-radius: 6px;
+            background:
+                linear-gradient(90deg, #9ca3af 50%, transparent 50%) repeat-x,
+                linear-gradient(90deg, #9ca3af 50%, transparent 50%) repeat-x,
+                linear-gradient(0deg, #9ca3af 50%, transparent 50%) repeat-y,
+                linear-gradient(0deg, #9ca3af 50%, transparent 50%) repeat-y;
+            background-size: 8px 1.5px, 8px 1.5px, 1.5px 8px, 1.5px 8px;
+            background-position: 0 0, 0 100%, 0 0, 100% 0;
+            animation: mediaAntMarch 0.5s linear infinite;
+            opacity: 0.85;
+        }
+        .media-dropzone.is-dragover .media-ant-tile,
+        .media-ant-tile.is-dragover {
+            background: rgba(37, 99, 235, 0.08);
+            color: #2563eb;
+        }
+        .media-dropzone.is-dragover .media-ant-tile-line,
+        .media-ant-tile.is-dragover .media-ant-tile-line {
+            background:
+                linear-gradient(90deg, #2563eb 50%, transparent 50%) repeat-x,
+                linear-gradient(90deg, #2563eb 50%, transparent 50%) repeat-x,
+                linear-gradient(0deg, #2563eb 50%, transparent 50%) repeat-y,
+                linear-gradient(0deg, #2563eb 50%, transparent 50%) repeat-y;
+            background-size: 8px 1.5px, 8px 1.5px, 1.5px 8px, 1.5px 8px;
+            background-position: 0 0, 0 100%, 0 0, 100% 0;
+        }
+        @keyframes mediaAntMarch {
+            to {
+                background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px;
+            }
+        }
+        .media-cat-card-hd .chevron {
+            margin-left: auto;
         }
         @media (max-width: 640px) {
             .lightbox-prev {
@@ -4379,10 +4447,28 @@
         .media-add-row {
             padding: 4px 0 0;
         }
+        .media-dropzone {
+            position: relative;
+            border: 1px dashed transparent;
+            border-radius: 8px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .media-dropzone.is-dragover {
+            border-color: var(--primary, #2563eb);
+            background: rgba(37, 99, 235, 0.06);
+        }
+        .media-dropzone-hint {
+            display: block;
+            margin-top: 4px;
+            font-size: 11px;
+            color: var(--text-tertiary, #9ca3af);
+            line-height: 1.3;
+        }
         .media-add-row--dual {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            align-items: center;
         }
         .media-add-row--dual .media-add-btn {
             width: auto;
@@ -6942,7 +7028,7 @@
                 <span class="lightbox-counter" id="lightboxCounter" hidden></span>
             </div>
         </div>
-        <input type="file" id="mediaImageFileInput" accept="image/*" hidden />
+        <input type="file" id="mediaImageFileInput" accept="image/*" multiple hidden />
     </div>
 
     <!-- ============================================================
@@ -7221,6 +7307,14 @@
                 }
                 await resolvePartnerContext();
                 applyChannelCatalogFilter();
+                try {
+                    if (window.DDCatalogDelist && DDCatalogDelist.load) {
+                        await DDCatalogDelist.load(false);
+                        applyChannelCatalogFilter();
+                    }
+                } catch (delistErr) {
+                    console.warn('下架规则加载失败（不影响浏览）', delistErr);
+                }
                 syncPriceVisibilityClass();
             } catch (err) {
                 console.warn('产品库加载失败（file:// 预览请用 GitHub Pages 或本地静态服务）', err);
@@ -7285,6 +7379,9 @@
             }
             catalog = applySupplierCatalogFilter(catalog);
             catalog = applyPartnerCatalogFilter(catalog);
+            if (window.DDCatalogDelist && DDCatalogDelist.filterProducts) {
+                catalog = DDCatalogDelist.filterProducts(catalog);
+            }
         }
 
         
@@ -7352,7 +7449,11 @@
         function loadHomeHotProducts() {
             const root = document.getElementById('homeHotList');
             if (!root) return;
-            const source = (catalog && catalog.length ? catalog : fullCatalog) || [];
+            const sourceRaw = (catalog && catalog.length ? catalog : fullCatalog) || [];
+            const source =
+                window.DDCatalogDelist && DDCatalogDelist.filterProducts
+                    ? DDCatalogDelist.filterProducts(sourceRaw)
+                    : sourceRaw;
             const withImg = source.filter((p) => p && p.image);
             const picks = (withImg.length ? withImg : source).slice(0, 4);
             if (!picks.length) {
@@ -7490,6 +7591,7 @@
                 }
                 const h5 = card.getAttribute('data-h5-url');
                 const id = decodeURIComponent(card.getAttribute('data-case-id') || '');
+                // 精选必须进详情+底部留资（对齐小程序 case-detail）；禁止直接跳 H5
                 if (id && homeCasesById[id]) {
                     openHomeCaseDetail(homeCasesById[id]);
                     return;
@@ -9451,7 +9553,7 @@
             return true;
         }
 
-        function addMediaImage(projectId, mediaKey, imageObj, categoryId) {
+        function addMediaImage(projectId, mediaKey, imageObj, categoryId, schemeVersion) {
             const p = findProjectById(projectId);
             if (!p) return false;
             if (mediaKey === 'production') {
@@ -9461,6 +9563,31 @@
             }
             if (mediaKey === 'shipping') {
                 addMediaImageToCategory(p, 'shipping', categoryId || SHIPPING_DEFAULT_CATEGORY, imageObj);
+                p.updatedFull = new Date().toISOString().slice(0, 10);
+                return true;
+            }
+            if (mediaKey === 'designerImages' && p.comm) {
+                if (!Array.isArray(p.comm.schemeVersions) || !p.comm.schemeVersions.length) {
+                    p.comm.schemeVersions = [{
+                        version: schemeVersion || 'V1',
+                        date: new Date().toISOString().slice(0, 10),
+                        summary: '方案图',
+                        images: [],
+                    }];
+                }
+                const verName = String(schemeVersion || p.comm.schemeVersions[0].version || 'V1');
+                let version = p.comm.schemeVersions.find(v => String(v.version || 'V1') === verName);
+                if (!version) {
+                    version = {
+                        version: verName,
+                        date: new Date().toISOString().slice(0, 10),
+                        summary: '方案图',
+                        images: [],
+                    };
+                    p.comm.schemeVersions.unshift(version);
+                }
+                version.images = [imageObj].concat(version.images || []).slice(0, 20);
+                p.comm.designerImages = [imageObj].concat(p.comm.designerImages || []).slice(0, 20);
                 p.updatedFull = new Date().toISOString().slice(0, 10);
                 return true;
             }
@@ -9678,31 +9805,36 @@
             const label = (ctx.sectionLabel || MEDIA_SECTION_KEYS[ctx.mediaKey]?.label || '图片').replace(/"/g, '&quot;');
             const commonAttrs = `data-project-id="${ctx.projectId}" data-media-key="${ctx.mediaKey}" data-section-label="${label}"`;
             const catAttr = ctx.categoryId ? ` data-category-id="${ctx.categoryId}"` : '';
+            const versionAttr = ctx.schemeVersion ? ` data-scheme-version="${String(ctx.schemeVersion).replace(/"/g, '&quot;')}"` : '';
+            const dropAttrs = `class="media-dropzone media-add-row${ctx.enableCamera || ctx.mediaKey === 'production' || ctx.mediaKey === 'shipping' ? ' media-add-row--dual' : ''}" ${commonAttrs}${catAttr}${versionAttr}`;
+            const hint = `<span class="media-dropzone-hint">可拖入多张图片，或点击选择</span>`;
             const enableCamera = ctx.enableCamera || ctx.mediaKey === 'production' || ctx.mediaKey === 'shipping';
             if (enableCamera) {
                 const catHint = ctx.categoryId ? ` · ${ctx.categoryLabel || ctx.categoryId}` : '';
-                return `<div class="media-add-row media-add-row--dual">
+                return `<div ${dropAttrs}>
                     <button type="button" class="media-add-btn media-add-btn--camera" data-add-image-camera
-                        ${commonAttrs}${catAttr}
+                        ${commonAttrs}${catAttr}${versionAttr}
                         aria-label="拍照 · ${label}${catHint}"
                         title="拍照 · ${label}${catHint}">
                         <i class="fas fa-camera"></i><span>拍照</span>
                     </button>
                     <button type="button" class="media-add-btn" data-add-image
-                        ${commonAttrs}${catAttr}
-                        aria-label="从相册选择 · ${label}${catHint}"
-                        title="从相册选择 · ${label}${catHint}">
+                        ${commonAttrs}${catAttr}${versionAttr}
+                        aria-label="从相册选择多张 · ${label}${catHint}"
+                        title="从相册选择多张 · ${label}${catHint}">
                         <i class="fas fa-image"></i><span>相册</span>
                     </button>
+                    ${hint}
                 </div>`;
             }
-            return `<div class="media-add-row">
+            return `<div ${dropAttrs}>
                 <button type="button" class="media-add-btn" data-add-image
-                    ${commonAttrs}${catAttr}
-                    aria-label="添加图片 · ${label}"
-                    title="添加图片 · ${label}">
+                    ${commonAttrs}${catAttr}${versionAttr}
+                    aria-label="添加多张图片 · ${label}"
+                    title="添加多张图片 · ${label}">
                     <i class="fas fa-plus"></i>
                 </button>
+                ${hint}
             </div>`;
         }
 
@@ -10172,6 +10304,23 @@
             return `<div class="media-layout-wrap"><div class="media-strip-row">${list.map((img, i) => renderMediaStripItemHtml(img, interactive, i, deleteCtx)).join('')}</div></div>`;
         }
 
+        function renderMediaAntTilesHtml(ctx) {
+            const label = (ctx.sectionLabel || ctx.categoryLabel || '图片').replace(/"/g, '&quot;');
+            const catLabel = (ctx.categoryLabel || '').replace(/"/g, '&quot;');
+            const commonAttrs = `data-project-id="${ctx.projectId}" data-media-key="${ctx.mediaKey}" data-section-label="${label}"${ctx.categoryId ? ` data-category-id="${ctx.categoryId}"` : ''}${catLabel ? ` data-category-label="${catLabel}"` : ''}`;
+            return `
+                <button type="button" class="media-ant-tile media-dropzone" data-add-image-camera ${commonAttrs}
+                    aria-label="拍照 · ${catLabel || label}" title="拍照">
+                    <span class="media-ant-tile-line" aria-hidden="true"></span>
+                    <i class="fas fa-camera"></i>
+                </button>
+                <button type="button" class="media-ant-tile media-dropzone" data-add-image ${commonAttrs}
+                    aria-label="相册多选 · ${catLabel || label}" title="相册多选 · 可拖入">
+                    <span class="media-ant-tile-line" aria-hidden="true"></span>
+                    <i class="fas fa-plus"></i>
+                </button>`;
+        }
+
         function renderMediaCategoryGrid(images, opts = {}) {
             const list = sortMediaImagesByDate(images);
             const interactive = opts.interactive !== false;
@@ -10184,10 +10333,66 @@
                     listIndex: opts.listIndex,
                 }
                 : null;
-            if (!list.length) {
-                return `<div class="media-cat-empty">暂无图片</div>`;
-            }
-            return `<div class="media-layout-wrap media-layout-wrap--grid"><div class="media-category-grid">${list.map((img, i) => renderMediaStripItemHtml(img, interactive, i, deleteCtx)).join('')}</div></div>`;
+            const tiles = (opts.projectId && opts.mediaKey)
+                ? renderMediaAntTilesHtml({
+                    projectId: opts.projectId,
+                    mediaKey: opts.mediaKey,
+                    sectionLabel: opts.sectionLabel || '',
+                    categoryId: opts.categoryId || null,
+                    categoryLabel: opts.categoryLabel || '',
+                })
+                : '';
+            const items = list.map((img, i) => renderMediaStripItemHtml(img, interactive, i, deleteCtx)).join('');
+            return `<div class="media-layout-wrap media-layout-wrap--grid"><div class="media-category-grid">${items}${tiles}</div></div>`;
+        }
+
+        function renderMediaCategoryBlock(cat, images, ctx) {
+            const count = images.length;
+            const gridOpts = {
+                interactive: true,
+                deletable: true,
+                projectId: ctx.projectId,
+                mediaKey: ctx.mediaKey,
+                categoryId: cat.id,
+                categoryLabel: cat.label,
+                sectionLabel: ctx.sectionLabel || '',
+            };
+            const gridHtml = renderMediaCategoryGrid(images, gridOpts);
+            const preview = count
+                ? renderMediaStripRow(images, { interactive: false })
+                : `<div class="media-cat-empty">暂无图片 · 展开后拖入或点格子</div>`;
+            const label = (ctx.sectionLabel || '').replace(/"/g, '&quot;');
+            const commonAttrs = `data-project-id="${ctx.projectId}" data-media-key="${ctx.mediaKey}" data-section-label="${label}" data-category-id="${cat.id}" data-category-label="${cat.label}"`;
+            return `<div class="media-cat-block media-cat-collapsible media-dropzone is-open" ${commonAttrs}>
+                <div class="media-cat-card-hd" data-toggle-media-cat aria-label="折叠${cat.label}">
+                    <span class="media-cat-label">${cat.label}</span>
+                    <span class="media-cat-count">${count} 张</span>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="media-cat-preview" data-toggle-media-cat aria-label="展开${cat.label}">${preview}</div>
+                <div class="media-cat-bd">${gridHtml}</div>
+            </div>`;
+        }
+
+        function renderCategorizedMediaSection(title, categoryDefs, normalized, projectId, sectionKey) {
+            const cardsHtml = categoryDefs.map(cat =>
+                renderMediaCategoryBlock(cat, normalized.categories[cat.id] || [], {
+                    projectId,
+                    mediaKey: sectionKey,
+                    sectionLabel: title,
+                })
+            ).join('');
+            return `
+                <section class="proj-section proj-collapsible proj-media-section proj-categorized-media is-open" data-section="${sectionKey}" data-media-section="${sectionKey}">
+                    <div class="proj-section-hd" data-toggle-section>
+                        <span class="proj-section-label">${title}</span>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                    <div class="proj-section-bd">
+                        <div class="media-cat-stack">${cardsHtml}</div>
+                    </div>
+                </section>
+            `;
         }
 
         function renderImageStripBar(images) {
@@ -10416,13 +10621,18 @@
                                 : vIdx,
                         })}</div>`
                         : '';
-                    return `<article class="scheme-version-block">
+                    return `<article class="scheme-version-block media-dropzone"
+                        data-project-id="${projectId}"
+                        data-media-key="designerImages"
+                        data-section-label="方案版本"
+                        data-scheme-version="${String(v.version || 'V1').replace(/"/g, '&quot;')}">
                         <div class="scheme-version-hd">
                             <span class="scheme-version-tag">${v.version || 'V1'}</span>
                             ${dateLabel ? `<span class="scheme-version-date">${dateLabel}</span>` : ''}
                         </div>
                         ${imgHtml}
                         <div class="section-text-card"><p class="section-summary">${v.summary || '—'}</p></div>
+                        <span class="media-dropzone-hint">拖入多张到 ${v.version || 'V1'}</span>
                     </article>`;
                 }).join('')
                 : `<div class="scheme-version-block"><div class="section-text-card"><p class="section-summary">暂无方案版本</p></div></div>`;
@@ -10491,98 +10701,41 @@
             `;
         }
 
-        function renderMediaCategoryBlock(cat, images, ctx) {
-            const count = images.length;
-            const preview = count
-                ? renderMediaStripRow(images, { interactive: false })
-                : `<div class="media-cat-empty">暂无图片</div>`;
-            const expanded = count
-                ? renderMediaCategoryGrid(images, {
-                    interactive: true,
-                    deletable: true,
-                    projectId: ctx.projectId,
-                    mediaKey: ctx.mediaKey,
-                    categoryId: cat.id,
-                })
-                : `<div class="media-cat-empty">暂无图片</div>`;
-            const label = (ctx.sectionLabel || '').replace(/"/g, '&quot;');
-            const commonAttrs = `data-project-id="${ctx.projectId}" data-media-key="${ctx.mediaKey}" data-section-label="${label}" data-category-id="${cat.id}" data-category-label="${cat.label}"`;
-            const actions = `<div class="media-cat-actions">
-                    <button type="button" class="media-add-btn" data-add-image-camera ${commonAttrs}
-                        aria-label="拍照 · ${cat.label}" title="拍照 · ${cat.label}"><i class="fas fa-camera"></i></button>
-                    <button type="button" class="media-add-btn" data-add-image ${commonAttrs}
-                        aria-label="相册 · ${cat.label}" title="相册 · ${cat.label}"><i class="fas fa-plus"></i></button>
-                </div>`;
-            return `<div class="media-cat-block media-cat-collapsible">
-                <div class="media-cat-card-hd" data-toggle-media-cat aria-label="展开${cat.label}">
-                    <span class="media-cat-label">${cat.label}</span>
-                    <span class="media-cat-count">${count} 张</span>
-                    ${actions}
-                    <i class="fas fa-chevron-down chevron"></i>
-                </div>
-                <div class="media-cat-preview" data-toggle-media-cat aria-label="展开${cat.label}">${preview}</div>
-                <div class="media-cat-bd">${expanded}</div>
-            </div>`;
-        }
-
-        function renderCategorizedMediaSection(title, categoryDefs, normalized, projectId, sectionKey) {
-            const mediaKey = sectionKey;
-            const addRow = renderMediaAddRowHtml({ projectId, mediaKey, sectionLabel: title });
-            const cardsHtml = categoryDefs.map(cat =>
-                renderMediaCategoryBlock(cat, normalized.categories[cat.id] || [], {
-                    projectId,
-                    mediaKey: sectionKey,
-                    sectionLabel: title,
-                })
-            ).join('');
-            return `
-                <section class="proj-section proj-collapsible proj-media-section proj-categorized-media" data-section="${sectionKey}" data-media-section="${sectionKey}">
-                    <div class="proj-section-hd" data-toggle-section>
-                        <span class="proj-section-label">${title}</span>
-                        <i class="fas fa-chevron-down chevron"></i>
-                    </div>
-                    <div class="proj-section-bd">
-                        <div class="media-cat-stack">${cardsHtml}</div>
-                        ${addRow}
-                    </div>
-                </section>
-            `;
-        }
-
         function renderSummaryStripSection(title, summary, images, extraHtml = '', mediaCtx = null) {
-            const addRow = mediaCtx ? renderMediaAddRowHtml(mediaCtx) : '';
             const list = images || [];
-            const previewStrip = renderMediaStripRow(list, { interactive: false });
             const sectionKey = mediaCtx?.mediaKey || '';
             const sectionDataAttr = sectionKey ? ` data-section="${sectionKey}"` : '';
-            const innerPreview = list.length
-                ? previewStrip
-                : `<div class="media-cat-empty">暂无图片</div>`;
-            const innerExpanded = `<div class="media-cat-stack media-cat-stack--flat">
-                <div class="media-cat-block media-cat-collapsible">
-                    <div class="media-cat-preview" data-toggle-media-cat aria-label="展开${title}">${innerPreview}</div>
-                    <div class="media-cat-bd">
-                        <div class="media-strip-wrap img-strip-wrap" data-img-strip>${renderMediaCategoryGrid(list, {
-                            interactive: true,
-                            deletable: !!(mediaCtx?.projectId && mediaCtx?.mediaKey),
-                            projectId: mediaCtx?.projectId,
-                            mediaKey: mediaCtx?.mediaKey,
-                            categoryId: mediaCtx?.categoryId || null,
-                        })}</div>
-                        <div class="section-text-card"><p class="section-summary">${summary || '暂无记录'}</p></div>
-                        ${extraHtml}
-                        ${addRow}
-                    </div>
-                </div>
-            </div>`;
+            const mediaAttrs = mediaCtx
+                ? ` data-project-id="${mediaCtx.projectId}" data-media-key="${mediaCtx.mediaKey}" data-section-label="${(mediaCtx.sectionLabel || title).replace(/"/g, '&quot;')}"${mediaCtx.categoryId ? ` data-category-id="${mediaCtx.categoryId}"` : ''}`
+                : '';
+            const gridHtml = mediaCtx
+                ? renderMediaCategoryGrid(list, {
+                    interactive: true,
+                    deletable: !!(mediaCtx.projectId && mediaCtx.mediaKey),
+                    projectId: mediaCtx.projectId,
+                    mediaKey: mediaCtx.mediaKey,
+                    categoryId: mediaCtx.categoryId || null,
+                    categoryLabel: mediaCtx.sectionLabel || title,
+                    sectionLabel: mediaCtx.sectionLabel || title,
+                })
+                : (list.length
+                    ? renderMediaStripRow(list, { interactive: true })
+                    : renderMediaAntTilesHtml({
+                        projectId: '',
+                        mediaKey: '',
+                        sectionLabel: title,
+                    }));
             return `
-                <section class="proj-section proj-collapsible proj-media-section"${sectionDataAttr}${mediaCtx?.mediaKey ? ` data-media-section="${mediaCtx.mediaKey}"` : ''}>
+                <section class="proj-section proj-collapsible proj-media-section is-open"${sectionDataAttr}${mediaCtx?.mediaKey ? ` data-media-section="${mediaCtx.mediaKey}"` : ''}>
                     <div class="proj-section-hd" data-toggle-section>
                         <span class="proj-section-label">${title}</span>
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                     <div class="proj-section-bd">
-                        ${innerExpanded}
+                        <div class="media-dropzone media-comm-upload-panel"${mediaAttrs}>
+                            ${gridHtml}
+                        </div>
+                        ${extraHtml || ''}
                     </div>
                 </section>
             `;
@@ -10867,40 +11020,141 @@
             /* 版块展开仅由 .is-open + 三角箭头表现 */
         }
 
+        function readFileAsDataUrl(file) {
+            return new Promise(function (resolve, reject) {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(reader.error || new Error('read_failed'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function collectImageFilesFromList(fileList) {
+            return Array.from(fileList || []).filter(function (f) {
+                return f && (/^image\//i.test(f.type) || /\.(jpe?g|png|gif|webp|bmp|heic)$/i.test(f.name || ''));
+            });
+        }
+
+        async function processMediaUploadFiles(files, ctx) {
+            if (!ctx || !files || !files.length) return;
+            const list = collectImageFilesFromList(files).slice(0, 20);
+            if (!list.length) {
+                showToast('未识别到图片', '请拖入或选择图片文件');
+                return;
+            }
+            let okCount = 0;
+            for (let i = 0; i < list.length; i += 1) {
+                const file = list[i];
+                try {
+                    const url = await readFileAsDataUrl(file);
+                    if (!url) continue;
+                    const ok = addMediaImage(
+                        ctx.projectId,
+                        ctx.mediaKey,
+                        {
+                            url,
+                            alt: String(file.name || 'image').replace(/\.[^.]+$/, ''),
+                            date: formatNowStripDate(),
+                            note: ctx.categoryLabel || ctx.schemeVersion || '',
+                        },
+                        ctx.categoryId || null,
+                        ctx.schemeVersion || null
+                    );
+                    if (ok) okCount += 1;
+                } catch (err) {
+                    console.warn('media upload read failed', err);
+                }
+            }
+            if (!okCount) {
+                showToast('添加失败', '请重试');
+                return;
+            }
+            persistLocalProjects();
+            refreshProjectShell(ctx.projectId);
+            const featured = findProjectById(ctx.projectId)?.showOnHomeFeatured;
+            if (featured) loadHomeCases();
+            const sectionName = ctx.sectionLabel || MEDIA_SECTION_KEYS[ctx.mediaKey]?.label || '版块';
+            const catPart = ctx.categoryLabel ? ` · ${ctx.categoryLabel}` : '';
+            const verPart = ctx.schemeVersion ? ` · ${ctx.schemeVersion}` : '';
+            showToast(
+                okCount > 1 ? `✅ 已添加 ${okCount} 张` : '✅ 图片已添加',
+                `已加入「${sectionName}${catPart}${verPart}」（本机保存）`
+            );
+        }
+
         function processMediaUploadFile(file, ctx) {
             if (!file || !ctx) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                const url = String(reader.result || '');
-                if (!url) return;
-                const ok = addMediaImage(ctx.projectId, ctx.mediaKey, {
-                    url,
-                    alt: file.name.replace(/\.[^.]+$/, ''),
-                    date: formatNowStripDate(),
-                    note: ctx.categoryLabel || '',
-                }, ctx.categoryId || null);
-                if (!ok) return;
-                persistLocalProjects();
-                refreshProjectShell(ctx.projectId);
-                const featured = findProjectById(ctx.projectId)?.showOnHomeFeatured;
-                if (featured) loadHomeCases();
-                const sectionName = ctx.sectionLabel || MEDIA_SECTION_KEYS[ctx.mediaKey]?.label || '版块';
-                const catPart = ctx.categoryLabel ? ` · ${ctx.categoryLabel}` : '';
-                showToast('✅ 图片已添加', `已加入「${sectionName}${catPart}」（本机保存）`);
+            processMediaUploadFiles([file], ctx);
+        }
+
+        function ctxFromDropzoneEl(el) {
+            if (!el) return null;
+            const zone = el.closest('[data-project-id][data-media-key]');
+            if (!zone) return null;
+            return {
+                projectId: zone.dataset.projectId,
+                mediaKey: zone.dataset.mediaKey,
+                sectionLabel: zone.dataset.sectionLabel || '',
+                categoryId: zone.dataset.categoryId || null,
+                categoryLabel: zone.dataset.categoryLabel || null,
+                schemeVersion: zone.dataset.schemeVersion || null,
             };
-            reader.onerror = () => showToast('读取失败', '无法读取该图片');
-            reader.readAsDataURL(file);
         }
 
         function initMediaImageUpload() {
             document.getElementById('mediaImageFileInput')?.addEventListener('change', (e) => {
-                const file = e.target.files?.[0];
+                const files = e.target.files;
                 const ctx = pendingMediaUpload;
                 pendingMediaUpload = null;
                 e.target.value = '';
                 e.target.removeAttribute('capture');
-                processMediaUploadFile(file, ctx);
+                processMediaUploadFiles(files, ctx);
             });
+
+            let dragDepth = 0;
+            const clearDrag = () => {
+                dragDepth = 0;
+                document.querySelectorAll('.media-dropzone.is-dragover').forEach((el) => {
+                    el.classList.remove('is-dragover');
+                });
+            };
+
+            document.addEventListener('dragenter', (e) => {
+                const zone = e.target.closest?.('.media-dropzone');
+                if (!zone || !e.dataTransfer) return;
+                const types = Array.from(e.dataTransfer.types || []);
+                if (types.indexOf('Files') < 0) return;
+                e.preventDefault();
+                dragDepth += 1;
+                zone.classList.add('is-dragover');
+            });
+            document.addEventListener('dragover', (e) => {
+                const zone = e.target.closest?.('.media-dropzone');
+                if (!zone) return;
+                e.preventDefault();
+                if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+                zone.classList.add('is-dragover');
+            });
+            document.addEventListener('dragleave', (e) => {
+                const zone = e.target.closest?.('.media-dropzone');
+                if (!zone) return;
+                dragDepth = Math.max(0, dragDepth - 1);
+                if (!zone.contains(e.relatedTarget)) {
+                    zone.classList.remove('is-dragover');
+                }
+                if (dragDepth === 0) clearDrag();
+            });
+            document.addEventListener('drop', (e) => {
+                const zone = e.target.closest?.('.media-dropzone');
+                clearDrag();
+                if (!zone) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const ctx = ctxFromDropzoneEl(zone);
+                const files = e.dataTransfer && e.dataTransfer.files;
+                processMediaUploadFiles(files, ctx);
+            });
+            window.addEventListener('dragend', clearDrag);
         }
 
         function triggerMediaImagePick(btn, useCamera) {
@@ -10910,13 +11164,16 @@
                 sectionLabel: btn.dataset.sectionLabel,
                 categoryId: btn.dataset.categoryId || null,
                 categoryLabel: btn.dataset.categoryLabel || null,
+                schemeVersion: btn.dataset.schemeVersion || null,
             };
             const input = document.getElementById('mediaImageFileInput');
             if (!input) return;
             if (useCamera) {
                 input.setAttribute('capture', 'environment');
+                input.removeAttribute('multiple');
             } else {
                 input.removeAttribute('capture');
+                input.setAttribute('multiple', 'multiple');
             }
             input.click();
         }
